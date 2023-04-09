@@ -5,7 +5,6 @@ from torch import float16
 from io import BytesIO
 import base64
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 IMAGE_MODEL = "../models/shane9r"
 NEGATIVE_PROMPT = "bad, deformed, ugly, bad anatomy, cartoon, animated," + \
                 "scary, wrinkles, duplicate, double"
@@ -15,11 +14,6 @@ INFERENCE_PIPE = StableDiffusionPipeline.from_pretrained(
             IMAGE_MODEL, torch_dtype=float16).to("cuda")
 
 app = Flask(__name__)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-              filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def generate_image(prompt):
@@ -44,12 +38,8 @@ def main_page():
 
 @app.route('/generate_image', methods=['POST'])
 def generate_image_request():
-    print(request.form)
-    prompt = request.form['prompt']
-    print(prompt)
-    image_str = generate_image(prompt)
     return {
-        "img_str": image_str
+        "img_str": generate_image(request.form['prompt'])
     }
 
 
