@@ -2,20 +2,31 @@
 <html>
 <head>
     <title>Image Upload</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='custom.css') }}">
 </head>
 <body>
     <h1>Load an Image</h1>
-    <form>
-        <input type="file" id="file-upload" name="file">
-        <input type="button" id="upload-button" value="Upload">
+    <form id="uploadImageForm">
+        <input type="file" id="fileUpload" name="file">
+        <input type="submit" class="submitButton" id="uploadButton" value="Upload">
     </form>
-    <form>
-        <input type="text" id="img-prompt" name="img_prompt" placeholder="Enter a prompt">
-        <input type="button" id="generate-image-button" value="Generate Image">
+    <form id="generateImageForm">
+        <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
+        <input type="submit" class="submitButton" id="generateImageButton" value="Generate Image">
     </form>
-    <div id="loaded-image-div" style="display: none;">
-        <h1>Uploaded Image</h1>
-        <img src="data:image/jpeg;base64,{{ img }}" id="loaded-image" alt="Loaded image">
+    <div id="loadedImageDisplay" style="display:none;">
+        <h1>Loaded Image</h1>
+        <div id="loader" class="loader" style="display: none;"></div>
+        <img src="" id="resultImage" class="displayed-image" alt="Loaded image" style="display:none;"/>
+        <div>
+            <a id="saveImageLink" href="#" download="image.png">
+                <button id="saveImageButton" class="submitButton">Save Image</button>
+            </a>
+        </div>
+        <div>
+            <button id="upscaleImageButton" class="submitButton" onclick="upscaleImage()">Upscale Image</button>
+        </div>
     </div>
 </body>
 <script src="{{ url_for('static', filename='scripts.js') }}"></script>

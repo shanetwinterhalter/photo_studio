@@ -1,0 +1,20 @@
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+  }
+
+  .displayed-image {
+    max-width: 100%; /* Adjust the width to your preference */
+    height: auto; /* Maintain aspect ratio */
+    image-rendering: optimizeQuality; /* Applies image smoothing in some browsers */
+    -ms-interpolation-mode: bicubic; /* Applies image smoothing in Internet Explorer */  
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

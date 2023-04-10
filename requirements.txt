@@ -1,6 +1,7 @@
 flask
 Pillow
-diffusers
+git+https://github.com/huggingface/diffusers
 torch
 transformers
 accelerate
+xformers==0.0.17

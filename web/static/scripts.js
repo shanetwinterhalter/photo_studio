@@ -1,51 +1,98 @@
-function convertFileToBase64(file, callback) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-        callback(base64String);
-    };
+function updateImage(imageUrl, success) {
+    $("#loader").hide();
+    if (success) {
+        $("#resultImage").attr("src", imageUrl);
+        $("#resultImage").show();
+        $("#saveImageLink").attr("href", imageUrl);
+        $("#saveImageLink").attr("download", imageUrl.split("/").slice(-1)[0]);
+    }
+    $(".submitButton").prop("disabled", false);
 }
 
-function updateImage(base64String) {
-    image.src = `data:image/jpeg;base64,${base64String}`;
+function setLoading() {
+    $(".submitButton").prop("disabled", true);
+    $("#loadedImageDisplay").show();
+    $("#loader").show();
+    $("#resultImage").hide();
 }
 
-function generateImage(prompt) {
-    const url = "/generate_image";
+function upscaleImage() {
+    setLoading();
+
+    $.ajax({
+        url: "/upscale_image",
+        method: "POST",
+        data: {
+            image_url: $("#resultImage").attr("src")
+        },
+        success: function (response) {
+            updateImage(response.image_url, true);
+        },
+        error: function (error) {
+            console.error(error);
+            updateImage("", false)
+        }
+    })
+}
+
+function generateImage() {
+    setLoading();
+
+    $.ajax({
+        url: "/generate_image",
+        method: "POST",
+        data: {
+            prompt: $("#imgPrompt").val()
+        },
+        success: function (response) {
+            updateImage(response.image_url, true);
+        },
+        error: function (error) {
+            console.error(error);
+            updateImage("", false)
+        }
+    })
+}
+
+function uploadImage() {
+    setLoading();
+
+    const fileInput = document.getElementById("fileUpload");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please choose a file.");
+        return;
+    }
 
     const formData = new FormData();
-    formData.append('prompt', prompt)
+    formData.append("image", file);
 
-    fetch(url, {
-        method: 'POST',
-        body: formData
+    $.ajax({
+        url: "/upload_image",
+        method: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            updateImage(data.image_url, true);
+        },
+        error: function (jqXHR, textStatus, errorMessage) {
+            console.error("Upload failed:", textStatus, errorMessage);
+            updateImage("", false)
+        }
     })
-        .then(response => response.json())
-        .then(data => updateImage(data.img_str))
-        .catch(error => console.error('Error:', error));
 }
 
-function showLoadedImage() {
-    const element = document.getElementById('loaded-image-div');
-    element.style.display = 'block';
+function onGenerateSubmit(event) {
+    event.preventDefault();
+    generateImage();
 }
 
-const generateButton = document.getElementById('generate-image-button');
-const uploadFile = document.getElementById('file-upload');
-const uploadButton = document.getElementById('upload-button');
-const image = document.getElementById('loaded-image');
+function onUploadSubmit(event) {
+    event.preventDefault();
+    uploadImage();
+}
 
-generateButton.addEventListener('click', () => {
-    const prompt = document.getElementById('img-prompt').value;
-    generateImage(prompt);
-    showLoadedImage();
-});
-
-uploadButton.addEventListener('click', () => {
-    const file = uploadFile.files[0];
-    convertFileToBase64(file, (base64String) => {
-        updateImage(base64String);
-    });
-    showLoadedImage();
-})
+$("#generateImageForm").submit(onGenerateSubmit);
+$("#uploadImageForm").submit(onUploadSubmit);
