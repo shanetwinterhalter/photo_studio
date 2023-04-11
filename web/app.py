@@ -1,4 +1,4 @@
-from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
+from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline, StableDiffusionInpaintPipeline
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from PIL import Image
 from hashlib import md5
@@ -7,15 +7,26 @@ import os
 import time
 import threading
 import torch
+import base64
+import io
+import json
+import numpy as np
 
 IMAGE_MODEL = "../models/shane9r"
-UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
-UPSCALE_RES = (256, 256)
 NEGATIVE_PROMPT = "bad, deformed, ugly, bad anatomy, cartoon, animated," + \
                 "scary, wrinkles, duplicate, double"
 NUM_INFERENCE_STEPS = 15
-UPSCALING_INFERENCE_STEPS = 15
 GUIDANCE_SCALE = 20
+
+UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
+UPSCALE_RES = (256, 256)
+UPSCALING_INFERENCE_STEPS = 15
+
+INPAINT_MODEL = "stabilityai/stable-diffusion-2-inpainting"
+INPAINTING_INFERENCE_STEPS = 15
+INPAINTING_GUIDANCE_SCALE = 7.5
+INPAINT_RES = (512, 512)
+
 
 app = Flask(__name__)
 app.config["IMAGE_UPLOADS"] = 'images'
@@ -84,6 +95,29 @@ def upscale_image():
                                       num_inference_steps=UPSCALING_INFERENCE_STEPS,
                                       negative_prompt=NEGATIVE_PROMPT).images[0]
     return jsonify({"image_url": save_image(upscaled_image)})
+
+
+@app.route('/inpaint_image', methods=['POST'])
+def inpaint_image():
+    inpainting_pipeline = StableDiffusionInpaintPipeline.from_pretrained(
+        INPAINT_MODEL, torch_dtype=torch.float16).to("cuda")
+    inpainting_pipeline.enable_xformers_memory_efficient_attention()
+
+    init_img = Image.open(request.form["image_url"]).convert("RGB")
+    decoded_mask = base64.b64decode(request.form["mask"]).decode("utf-8")
+    mask_list = json.loads(decoded_mask)
+    height, width = init_img.size
+    mask_array = np.array(mask_list, dtype=np.uint8).reshape(height, width) * 255
+    mask_img = Image.fromarray(mask_array).convert("RGB")
+
+    inpainted_image = inpainting_pipeline(prompt="",
+                                          negative_prompt=NEGATIVE_PROMPT,
+                                          num_inference_steps=INPAINTING_INFERENCE_STEPS,
+                                          guidance_scale=INPAINTING_GUIDANCE_SCALE,
+                                          image=init_img.resize(INPAINT_RES),
+                                          mask_image=mask_img.resize(INPAINT_RES)).images[0]
+
+    return jsonify({"image_url": save_image(inpainted_image)})
 
 
 @app.route("/images/<path:filename>")

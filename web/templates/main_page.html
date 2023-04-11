@@ -1,31 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Upload</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='custom.css') }}">
 </head>
 <body>
-    <h1>Load an Image</h1>
-    <form id="uploadImageForm">
-        <input type="file" id="fileUpload" name="file">
-        <input type="submit" class="submitButton" id="uploadButton" value="Upload">
-    </form>
-    <form id="generateImageForm">
-        <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
-        <input type="submit" class="submitButton" id="generateImageButton" value="Generate Image">
-    </form>
-    <div id="loadedImageDisplay" style="display:none;">
-        <h1>Loaded Image</h1>
-        <div id="loader" class="loader" style="display: none;"></div>
-        <img src="" id="resultImage" class="displayed-image" alt="Loaded image" style="display:none;"/>
+    <div id="sidebar">
+        <h1>Load an Image</h1>
+        <form id="uploadImageForm">
+            <input type="file" id="fileUpload" name="file">
+            <input type="submit" class="submitButton" id="uploadButton" value="Upload">
+        </form>
+        <h1>Generate an Image</h1>
+        <form id="generateImageForm">
+            <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
+            <input type="submit" class="submitButton" id="generateImageButton" value="Generate Image">
+        </form>
+        <h1>Image Inpainting</h1>
+        <div>
+            <button id="inpaintButton" class="submitButton" onclick="inpaintImage()" type="button">Inpaint</button>
+        </div>
+        <h1>Image Upscaling</h1>
+        <div>
+            <button id="upscaleImageButton" class="submitButton" onclick="upscaleImage()" type="button">Upscale Image</button>
+        </div>
+        <h1>Save Image</h1>
         <div>
             <a id="saveImageLink" href="#" download="image.png">
                 <button id="saveImageButton" class="submitButton">Save Image</button>
             </a>
         </div>
-        <div>
-            <button id="upscaleImageButton" class="submitButton" onclick="upscaleImage()">Upscale Image</button>
+    </div>
+    <div id="content">
+        <div id="loadedImageDisplay" style="display:none;">
+            <div id="imageContainer">
+                <img src="" id="resultImage" class="displayed-image" alt="Loaded image" style="display:none;"/>
+                <canvas id="canvas"></canvas>
+                <div id="loader" class="loader" style="display: none;"></div>
+            </div>
         </div>
     </div>
 </body>
