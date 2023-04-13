@@ -9,6 +9,7 @@ let mask = null;
 function updateImage(imageUrl, success) {
     $("#loader").hide();
     $("#resultImage").css("opacity", 1);
+    //$("#canvas").css("opacity", 1);
     if (success) {
         img = $("#resultImage")
         img.attr("src", ""); // Clear image
@@ -20,8 +21,10 @@ function updateImage(imageUrl, success) {
         img.show();
         $("#saveImageLink").attr("href", imageUrl);
         $("#saveImageLink").attr("download", imageUrl.split("/").slice(-1)[0]);
+        generateSegmentMask(imageUrl);
     }
-    $(".submitButton").prop("disabled", false);
+    // TODO: Re-add when running segmentation in parallel
+    //$(".submitButton").prop("disabled", false);
 }
 
 function updateImageSize() {
@@ -94,6 +97,7 @@ function setLoading() {
     $("#loadedImageDisplay").show();
     $("#loader").show();
     $("#resultImage").css("opacity", 0.5);
+    //$("#canvas").css("opacity", 0.5);
 }
 
 function upscaleImage() {
@@ -113,6 +117,26 @@ function upscaleImage() {
             updateImage("", false)
         }
     })
+}
+
+function generateSegmentMask(imageUrl) {
+    $(".submitButton").prop("disabled", true);
+    $.ajax({
+        url: "/segment_image",
+        method: "POST",
+        data: {
+            image_url: imageUrl
+        },
+        success: function (response) {
+            $(".submitButton").prop("disabled", false);
+            console.log(response.image_mask);
+        },
+        error: function (error) {
+            $(".submitButton").prop("disabled", false);
+            console.error(error);
+        }
+    })
+    
 }
 
 function generateImage() {

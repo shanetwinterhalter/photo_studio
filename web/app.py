@@ -1,8 +1,11 @@
-from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline, StableDiffusionInpaintPipeline
+from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
+from diffusers import StableDiffusionInpaintPipeline
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from PIL import Image
 from hashlib import md5
 from datetime import datetime, timedelta
+from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
+import cv2
 import os
 import time
 import threading
@@ -12,7 +15,11 @@ import io
 import json
 import numpy as np
 
+import time
+
+
 IMAGE_MODEL = "../models/shane9r"
+SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
 NEGATIVE_PROMPT = "bad, deformed, ugly, bad anatomy, cartoon, animated," + \
                 "scary, wrinkles, duplicate, double"
 NUM_INFERENCE_STEPS = 15
@@ -50,7 +57,11 @@ def delete_old_files():
 
 def save_image(image):
     filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
-    image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename), 'JPEG', quality=90)
+    image.save(
+        os.path.join(app.config["IMAGE_UPLOADS"], filename),
+        'JPEG',
+        quality=90
+    )
     image_url = f"{app.config['IMAGE_UPLOADS']}/{filename}"
     return image_url
 
@@ -90,10 +101,12 @@ def upscale_image():
     init_img = Image.open(request.form["image_url"]).convert("RGB")
     init_img = init_img.resize(UPSCALE_RES)
 
-    upscaled_image = upscale_pipeline(prompt="",
-                                      image=init_img,
-                                      num_inference_steps=UPSCALING_INFERENCE_STEPS,
-                                      negative_prompt=NEGATIVE_PROMPT).images[0]
+    upscaled_image = upscale_pipeline(
+        prompt="",
+        image=init_img,
+        num_inference_steps=UPSCALING_INFERENCE_STEPS,
+        negative_prompt=NEGATIVE_PROMPT
+    ).images[0]
     return jsonify({"image_url": save_image(upscaled_image)})
 
 
@@ -105,19 +118,42 @@ def inpaint_image():
 
     init_img = Image.open(request.form["image_url"]).convert("RGB")
     decoded_mask = base64.b64decode(request.form["mask"]).decode("utf-8")
-    mask_list = json.loads(decoded_mask)
     height, width = init_img.size
-    mask_array = np.array(mask_list, dtype=np.uint8).reshape(height, width) * 255
+    mask_array = np.array(json.loads(decoded_mask), dtype=np.uint8)
+    mask_array = mask_array.reshape(height, width) * 255
     mask_img = Image.fromarray(mask_array).convert("RGB")
 
-    inpainted_image = inpainting_pipeline(prompt="",
-                                          negative_prompt=NEGATIVE_PROMPT,
-                                          num_inference_steps=INPAINTING_INFERENCE_STEPS,
-                                          guidance_scale=INPAINTING_GUIDANCE_SCALE,
-                                          image=init_img.resize(INPAINT_RES),
-                                          mask_image=mask_img.resize(INPAINT_RES)).images[0]
+    inpainted_image = inpainting_pipeline(
+        prompt="",
+        negative_prompt=NEGATIVE_PROMPT,
+        num_inference_steps=INPAINTING_INFERENCE_STEPS,
+        guidance_scale=INPAINTING_GUIDANCE_SCALE,
+        height=init_img.size[1],
+        width=init_img.size[0],
+        image=init_img,  # .resize(INPAINT_RES),
+        mask_image=mask_img  # .resize(INPAINT_RES)
+    ).images[0]
 
     return jsonify({"image_url": save_image(inpainted_image)})
+
+
+@app.route('/segment_image', methods=['POST'])
+def segment_image():
+    print("Starting image segmentation")
+    start_time = time.time()
+    img = cv2.imread(request.form["image_url"])
+    sam = sam_model_registry["vit_h"](checkpoint=SEGMENT_MODEL)
+    sam.to("cuda")
+    mask_generator = SamAutomaticMaskGenerator(sam)
+    masks = mask_generator.generate(img)
+    for item in masks:
+        item["segmentation"] = item["segmentation"].tolist()
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Segmentation complete, it took {elapsed_time:.6f} seconds")
+    return jsonify(
+        {"image_mask": masks}
+    )
 
 
 @app.route("/images/<path:filename>")

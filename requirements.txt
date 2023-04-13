@@ -5,3 +5,5 @@ torch
 transformers
 accelerate
 xformers==0.0.17
+opencv-python
+git+https://github.com/facebookresearch/segment-anything.git
