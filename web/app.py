@@ -130,8 +130,8 @@ def inpaint_image():
         guidance_scale=INPAINTING_GUIDANCE_SCALE,
         height=init_img.size[1],
         width=init_img.size[0],
-        image=init_img,  # .resize(INPAINT_RES),
-        mask_image=mask_img  # .resize(INPAINT_RES)
+        image=init_img,
+        mask_image=mask_img
     ).images[0]
 
     return jsonify({"image_url": save_image(inpainted_image)})
