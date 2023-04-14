@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Upload</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='custom.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/custom.css') }}">
 </head>
 <body>
     <div id="sidebar">
@@ -21,17 +21,15 @@
         </form>
         <h1>Image Inpainting</h1>
         <div>
-            <button id="inpaintButton" class="submitButton" onclick="inpaintImage()" type="button">Inpaint</button>
+            <button id="inpaintButton" class="submitButton" type="button">Inpaint</button>
         </div>
         <h1>Image Upscaling</h1>
         <div>
-            <button id="upscaleImageButton" class="submitButton" onclick="upscaleImage()" type="button">Upscale Image</button>
+            <button id="upscaleImageButton" class="submitButton" type="button">Upscale Image</button>
         </div>
         <h1>Save Image</h1>
         <div>
-            <a id="saveImageLink" href="#" download="image.png">
-                <button id="saveImageButton" class="submitButton">Save Image</button>
-            </a>
+            <button id="saveImageButton">Save Image</button>
         </div>
     </div>
     <div id="content">
@@ -44,5 +42,5 @@
         </div>
     </div>
 </body>
-<script src="{{ url_for('static', filename='scripts.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </html>
