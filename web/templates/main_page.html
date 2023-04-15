@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Upload</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/custom.css') }}">
 </head>
 <body>
@@ -19,9 +20,17 @@
             <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
             <input type="submit" class="submitButton" id="generateImageButton" value="Generate Image">
         </form>
-        <h1>Image Inpainting</h1>
+        <h1>Image Editing</h1>
         <div>
-            <button id="inpaintButton" class="submitButton" type="button">Inpaint</button>
+            <button id="brushIcon" class="icon-button">
+                <i class="fa fa-paint-brush" aria-hiudden="true"></i>
+            </button>
+            <button id="maskIcon" class="icon-button">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div>
+            <button id="inpaintButton" class="submitButton" type="button">Update Image</button>
         </div>
         <h1>Image Upscaling</h1>
         <div>
@@ -35,7 +44,7 @@
     <div id="content">
         <div id="loadedImageDisplay" style="display:none;">
             <div id="imageContainer">
-                <img src="" id="resultImage" class="displayed-image" alt="Loaded image" style="display:none;"/>
+                <img id="resultImage" class="displayed-image" alt="Loaded image" style="display:none;"/>
                 <canvas id="canvas"></canvas>
                 <div id="loader" class="loader" style="display: none;"></div>
             </div>

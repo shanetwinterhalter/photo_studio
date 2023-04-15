@@ -42,4 +42,10 @@ observer.observe($("#resultImage")[0], {
     attributeFilter: ['src'],
 })
 
+$(".icon-button").on("click", function () {
+    $(".icon-button").removeClass("active");
+
+    $(this).addClass("active");
+});
+
 window.addEventListener("resize", resizeImage);

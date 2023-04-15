@@ -18,6 +18,10 @@ function binaryStringToBase64(binaryString) {
 }
 
 export function inpaintImage() {
+    if($("#resultImage").attr("src") == null) {
+        alert("Please upload an image first!");
+        return;
+    }
     disableUi(true);
 
     const maskBinaryString = maskToBinaryString(mask);

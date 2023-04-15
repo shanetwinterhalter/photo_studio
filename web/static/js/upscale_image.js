@@ -1,6 +1,10 @@
 import { disableUi, updateImage } from "./ui.js";
 
 export function upscaleImage() {
+    if($("#resultImage").attr("src") == null) {
+        alert("Please upload an image first!");
+        return;
+    }
     disableUi(true);
 
     $.ajax({
