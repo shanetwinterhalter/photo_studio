@@ -5,10 +5,17 @@ let mask;
 let painting = false;
 const brushSize = 10; // Set your desired brush size
 
+let toolMode = "brush";
+
 // Brush tool
 function startPosition(e) {
     painting = true;
-    draw(e);
+
+    if (toolMode === "brush") {
+        draw(e);
+    } else if (toolMode === "segMasks") {
+        applyPredefinedMask(e)
+    }
 }
 
 function finishedPosition() {
@@ -57,11 +64,11 @@ export function configureCanvas() {
         mask = new Array(img.naturalWidth * img.naturalHeight).fill(0);
     
         canvas.addEventListener("mousedown", startPosition);
-        canvas.addEventListener("mouseup", function(e) {
-            finishedPosition(ctx)
-        });
+        canvas.addEventListener("mouseup", finishedPosition);
         canvas.addEventListener("mousemove", function (e) {
-            draw(e, ctx, img, mask, brushSize);
+            if (toolMode === "brush") {
+                draw(e);
+            }
         });
     })
 }
