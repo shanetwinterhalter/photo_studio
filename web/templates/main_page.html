@@ -10,31 +10,46 @@
 </head>
 <body>
     <div id="sidebar">
-        <h1>Load an Image</h1>
+        <h2>Upload an image</h2>
         <form id="uploadImageForm">
             <input type="file" id="fileUpload" name="file">
             <input type="submit" class="submitButton" id="uploadButton" value="Upload">
         </form>
-        <form id="generateImageForm">
-            <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
-            <input type="submit" class="submitButton" id="generateImageButton" value="Generate Image">
-        </form>
-        <h1>Image Editing</h1>
+        <h2>Image Creation and Editing</h2>
         <div>
-            <button id="brushIcon" class="icon-button">
-                <i class="fa fa-paint-brush" aria-hiudden="true"></i>
-            </button>
-            <button id="maskIcon" class="icon-button">
-                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-            </button>
+            <div>
+                <p>Prompt:</p>
+                <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
+            </div>
+            <div>
+                <p>Negative Prompt:</p>
+                <input type="text" id="negativePrompt" name="negative_prompt" placeholder="Enter a negative prompt">
+            </div>
+            <div>
+                <p>Number of inference steps:</p>
+                <input type="range" min="0" max="100" value="{{ DEFAULTARGS.inferenceSteps }}" id="stepsSlider" oninput="updateStepsValue(this.value)">
+                <span id="stepsValue">{{ DEFAULTARGS.inferenceSteps }}</span>
+            </div>
+            <div>
+                <p>Guidance scale:</p>
+                <input type="range" min="0" max="30" value="{{ DEFAULTARGS.guidanceScale }}" id="guidanceSlider" oninput="updateGuidanceValue(this.value)">
+                <span id="guidanceValue">{{ DEFAULTARGS.guidanceScale }}</span>
+            </div>
+            <div>
+                <button id="brushIcon" class="icon-button">
+                    <i class="fa fa-paint-brush" aria-hiudden="true"></i>
+                </button>
+                <button id="maskIcon" class="icon-button">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div>
+                <button id="generateImageButton" class="submitButton" type="button">Generate new image</button>
+                <button id="upscaleImageButton" class="submitButton" type="button">Upscale loaded image</button>
+                <button id="inpaintButton" class="submitButton" type="button">Update loaded image</button>
+            </div>
         </div>
-        <div>
-            <button id="inpaintButton" class="submitButton" type="button">Update Image</button>
-        </div>
-        <div>
-            <button id="upscaleImageButton" class="submitButton" type="button">Upscale Image</button>
-        </div>
-        <h1>Save Image</h1>
+        <h2>Save Image</h2>
         <div>
             <button id="saveImageButton">Save Image</button>
         </div>
@@ -50,4 +65,13 @@
     </div>
 </body>
 <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+    function updateStepsValue(value) {
+        document.getElementById('stepsValue').innerText = value;
+    }
+
+    function updateGuidanceValue(value) {
+        document.getElementById('guidanceValue').innerText = value;
+    }
+</script>
 </html>

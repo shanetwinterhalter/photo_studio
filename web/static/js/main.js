@@ -10,8 +10,7 @@ $("#uploadImageForm").on("submit", function (event) {
 });
 
 // When image generated
-$("#generateImageForm").on("submit", function (event) {
-    event.preventDefault();
+$("#generateImageButton").on("click", function (event) {
     generateImage();
 });
 

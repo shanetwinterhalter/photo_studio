@@ -41,7 +41,11 @@ export function upscaleImage() {
         url: "/upscale_image",
         method: "POST",
         data: {
-            image_url: $("#resultImage").attr("src")
+            prompt: $("#imgPrompt").val(),
+            image_url: $("#resultImage").attr("src"),
+            negativePrompt: $("#negativePrompt").val(),
+            inferenceSteps: $("#stepsSlider").val(),
+            guidanceScale: $("#guidanceSlider").val(),
         },
         success: function (response) {
             updateImage(response.image_url);
@@ -68,8 +72,12 @@ export function inpaintImage() {
         url: "/inpaint_image",
         method: "POST",
         data: {
+            prompt: $("#imgPrompt").val(),
             image_url: $("#resultImage").attr("src"),
-            mask: maskBase64
+            mask: maskBase64,
+            negativePrompt: $("#negativePrompt").val(),
+            inferenceSteps: $("#stepsSlider").val(),
+            guidanceScale: $("#guidanceSlider").val(),
         },
         success: function (response) {
             updateImage(response.image_url);

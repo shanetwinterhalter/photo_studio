@@ -16,22 +16,23 @@ import random
 
 import time
 
+DEFAULTARGS = {
+    "prompt": "a portrait photo of a shane man, handsome, " +
+              "clear skin, photograph, photorealistic, well lit",
+    "inferenceSteps": "15",
+    "guidanceScale": "7.5",
+    "negativePrompt": "bad, deformed, ugly, bad anatomy, cartoon, " +
+                      "animated, scary, wrinkles, duplicate, double"
+}
 
 IMAGE_MODEL = "../models/shane9r"
 SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
-NEGATIVE_PROMPT = "bad, deformed, ugly, bad anatomy, cartoon, animated," + \
-                "scary, wrinkles, duplicate, double"
-NUM_INFERENCE_STEPS = 15
-GUIDANCE_SCALE = 20
 
 UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
 UPSCALE_RES = (256, 256)
-UPSCALING_INFERENCE_STEPS = 15
 
 INPAINT_MODEL = "stabilityai/stable-diffusion-2-inpainting"
-INPAINTING_INFERENCE_STEPS = 15
-INPAINTING_GUIDANCE_SCALE = 7.5
-INPAINT_RES = (512, 512)
+MAX_INPAINT_RES = (1024, 1024)
 
 
 app = Flask(__name__)
@@ -78,21 +79,49 @@ def save_image(image):
     return image_url
 
 
+def get_prompt(prompt):
+    if prompt:
+        return prompt
+    else:
+        return DEFAULTARGS["prompt"]
+
+
+def get_negative_prompt(request):
+    if request:
+        return request
+    else:
+        return DEFAULTARGS["negativePrompt"]
+
+
+def resize_image(image, max_res):
+    width, height = image.size
+    if width > max_res[0] or height > max_res[1]:
+        if width > height:
+            new_width = max_res[0]
+            new_height = int(height * new_width / width)
+        else:
+            new_height = max_res[1]
+            new_width = int(width * new_height / height)
+        return image.resize((new_width, new_height))
+    else:
+        return image
+
+
 @app.route('/', methods=['GET'])
 def main_page():
-    return render_template('main_page.html')
+    return render_template('main_page.html', DEFAULTARGS=DEFAULTARGS)
 
 
 @app.route('/generate_image', methods=['POST'])
 def generate_image():
-    prompt = request.form["prompt"]
     inference_pipe = StableDiffusionPipeline.from_pretrained(
             IMAGE_MODEL, torch_dtype=torch.float16).to("cuda")
+
     image = inference_pipe(
-        prompt,
-        negative_prompt=NEGATIVE_PROMPT,
-        num_inference_steps=NUM_INFERENCE_STEPS,
-        guidance_scale=GUIDANCE_SCALE
+        get_prompt(request.form["prompt"]),
+        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
+        num_inference_steps=int(request.form["inferenceSteps"]),
+        guidance_scale=float(request.form["guidanceScale"])
         ).images[0]
 
     return jsonify({"image_url": save_image(image)})
@@ -114,10 +143,11 @@ def upscale_image():
     init_img = init_img.resize(UPSCALE_RES)
 
     upscaled_image = upscale_pipeline(
-        prompt="",
+        prompt=get_prompt(request.form["prompt"]),
         image=init_img,
-        num_inference_steps=UPSCALING_INFERENCE_STEPS,
-        negative_prompt=NEGATIVE_PROMPT
+        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
+        num_inference_steps=int(request.form["inferenceSteps"]),
+        guidance_scale=float(request.form["guidanceScale"])
     ).images[0]
     return jsonify({"image_url": save_image(upscaled_image)})
 
@@ -132,18 +162,20 @@ def inpaint_image():
     decoded_mask = base64.b64decode(request.form["mask"])
     height, width = init_img.size
     mask_array = np.frombuffer(decoded_mask, dtype=np.uint8)
-    mask_array = mask_array.reshape(height, width) * 255
+    mask_array = mask_array.reshape(width, height) * 255
     mask_img = Image.fromarray(mask_array).convert("RGB")
+    init_img = resize_image(init_img, MAX_INPAINT_RES)
+    mask_img = mask_img.resize(init_img.size)
 
     inpainted_image = inpainting_pipeline(
-        prompt="",
-        negative_prompt=NEGATIVE_PROMPT,
-        num_inference_steps=INPAINTING_INFERENCE_STEPS,
-        guidance_scale=INPAINTING_GUIDANCE_SCALE,
+        prompt=get_prompt(request.form["prompt"]),
         height=init_img.size[1],
         width=init_img.size[0],
         image=init_img,
-        mask_image=mask_img
+        mask_image=mask_img,
+        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
+        num_inference_steps=int(request.form["inferenceSteps"]),
+        guidance_scale=float(request.form["guidanceScale"])
     ).images[0]
 
     return jsonify({"image_url": save_image(inpainted_image)})

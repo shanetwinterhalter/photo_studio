@@ -38,7 +38,10 @@ export function generateImage() {
         url: "/generate_image",
         method: "POST",
         data: {
-            prompt: $("#imgPrompt").val()
+            prompt: $("#imgPrompt").val(),
+            negativePrompt: $("#negativePrompt").val(),
+            inferenceSteps: $("#stepsSlider").val(),
+            guidanceScale: $("#guidanceSlider").val(),
         },
         success: function (response) {
             updateImage(response.image_url);
