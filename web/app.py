@@ -11,9 +11,8 @@ import time
 import threading
 import torch
 import base64
-import io
-import json
 import numpy as np
+import random
 
 import time
 
@@ -38,6 +37,19 @@ INPAINT_RES = (512, 512)
 app = Flask(__name__)
 app.config["IMAGE_UPLOADS"] = 'images'
 app.config["MAX_IMAGE_AGE_HOURS"] = 24
+
+
+def save_segmented_image(image, masks):
+    colors = [tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(len(masks))]
+    for idx, mask in enumerate(masks):
+        mask = np.array(mask['segmentation'], dtype=np.uint8)
+
+        color_mask = np.zeros_like(image)
+        color_mask[mask > 0] = colors[idx]
+        # Overlay the color mask on the image
+        image = cv2.addWeighted(image, 1, color_mask, 0.5, 0)
+    # Save the output image
+    cv2.imwrite(os.path.join(app.config["IMAGE_UPLOADS"], 'segmented_image.jpg'), image)
 
 
 def delete_old_files():
@@ -117,9 +129,9 @@ def inpaint_image():
     inpainting_pipeline.enable_xformers_memory_efficient_attention()
 
     init_img = Image.open(request.form["image_url"]).convert("RGB")
-    decoded_mask = base64.b64decode(request.form["mask"]).decode("utf-8")
+    decoded_mask = base64.b64decode(request.form["mask"])
     height, width = init_img.size
-    mask_array = np.array(json.loads(decoded_mask), dtype=np.uint8)
+    mask_array = np.frombuffer(decoded_mask, dtype=np.uint8)
     mask_array = mask_array.reshape(height, width) * 255
     mask_img = Image.fromarray(mask_array).convert("RGB")
 
@@ -139,8 +151,6 @@ def inpaint_image():
 
 @app.route('/segment_image', methods=['POST'])
 def segment_image():
-    print("Starting image segmentation")
-    start_time = time.time()
     img = cv2.imread(request.form["image_url"])
     sam = sam_model_registry["vit_h"](checkpoint=SEGMENT_MODEL)
     sam.to("cuda")
@@ -148,9 +158,7 @@ def segment_image():
     masks = mask_generator.generate(img)
     for item in masks:
         item["segmentation"] = item["segmentation"].tolist()
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Segmentation complete, it took {elapsed_time:.6f} seconds")
+    save_segmented_image(img, masks)
     return jsonify(
         {"image_mask": masks}
     )

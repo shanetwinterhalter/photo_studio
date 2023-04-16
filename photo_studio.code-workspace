@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../segment-anything"
+		},
+		{
+			"path": "../stablediffusion_finetuning"
+		}
+	],
+	"settings": {}
+}

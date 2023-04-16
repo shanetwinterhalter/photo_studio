@@ -1,38 +1,26 @@
-import { uploadImage } from './upload_image.js';
-import { generateImage } from './generate_image.js';
-import { inpaintImage } from './inpaint_image.js';
-import { upscaleImage } from './upscale_image.js';
-import { resizeImage } from './ui.js';
-import { configureCanvas } from './drawing.js';
-import { generateSegmentMask } from './image_segmentation.js';
-import { configureSaveButton } from './image_download.js';
+import { uploadImage, generateImage, generateSegmentMask } from './loadImage.js';
+import { configureSaveButton } from './imageDownload.js';
+import { inpaintImage, upscaleImage } from './editImage.js';
+import { configureCanvas } from './createMask.js';
 
-function onGenerateSubmit(event) {
-    event.preventDefault();
-    generateImage();
-}
-
-function onUploadSubmit(event) {
+// When upload button pressed
+$("#uploadImageForm").on("submit", function (event) {
     event.preventDefault();
     uploadImage();
-}
+});
 
-function imageSrcUpdate() {
-    configureSaveButton();
-    configureCanvas();
-    generateSegmentMask();
-}
+// When image generated
+$("#generateImageForm").on("submit", function (event) {
+    event.preventDefault();
+    generateImage();
+});
 
-$("#generateImageForm").submit(onGenerateSubmit);
-$("#uploadImageForm").submit(onUploadSubmit);
-$("#inpaintButton").click(inpaintImage);
-$("#upscaleImageButton").click(upscaleImage);
-
-// Run on any change to the image src
+// Listener to request segment mask whenever image updated
 const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
         if (mutation.type === "attributes" && mutation.attributeName === "src") {
-            imageSrcUpdate();
+            generateSegmentMask();
+            configureCanvas();
         }
     });
 });
@@ -42,10 +30,22 @@ observer.observe($("#resultImage")[0], {
     attributeFilter: ['src'],
 })
 
-$(".icon-button").on("click", function () {
-    $(".icon-button").removeClass("active");
-
-    $(this).addClass("active");
+// Request server to update image
+$("#inpaintButton").on("click", function() {
+    inpaintImage();
+});
+// Upscale image
+$("#upscaleImageButton").on("click", function() {
+    upscaleImage();
 });
 
-window.addEventListener("resize", resizeImage);
+// On image saving
+$("#saveImageButton").on("click", function() {
+    configureSaveButton();
+});
+
+// Make edit icons exclusive
+$(".icon-button").on("click", function () {
+    $(".icon-button").removeClass("active");
+    $(this).addClass("active");
+});

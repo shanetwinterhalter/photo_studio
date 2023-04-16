@@ -1,16 +1,6 @@
-export function resizeImage() {
-    const content = document.getElementById('content');
-    const image = document.getElementById('resultImage');
-  
-    image.style.maxWidth = `${content.clientWidth}px`;
-    image.style.maxHeight = `${content.clientHeight}px`;
-}
 export function updateImage(imageUrl) {
     const img = $("#resultImage")
     img.attr("src", imageUrl);
-    img.on("load", function() {
-        resizeImage();
-    });
     img.show();
 }
 
