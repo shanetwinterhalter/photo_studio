@@ -5,6 +5,7 @@ from PIL import Image
 from hashlib import md5
 from datetime import datetime, timedelta
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
+from torch.cuda import OutOfMemoryError
 import cv2
 import os
 import time
@@ -34,6 +35,8 @@ UPSCALE_RES = (256, 256)
 INPAINT_MODEL = "stabilityai/stable-diffusion-2-inpainting"
 MAX_INPAINT_RES = (1024, 1024)
 
+MAX_REQUEST_RETRIES = 6
+RETRY_DELAY = 20
 
 app = Flask(__name__)
 app.config["IMAGE_UPLOADS"] = 'images'
@@ -41,7 +44,8 @@ app.config["MAX_IMAGE_AGE_HOURS"] = 24
 
 
 def save_segmented_image(image, masks):
-    colors = [tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(len(masks))]
+    colors = [tuple([random.randint(0, 255) for
+                     _ in range(3)]) for _ in range(len(masks))]
     for idx, mask in enumerate(masks):
         mask = np.array(mask['segmentation'], dtype=np.uint8)
 
@@ -50,7 +54,8 @@ def save_segmented_image(image, masks):
         # Overlay the color mask on the image
         image = cv2.addWeighted(image, 1, color_mask, 0.5, 0)
     # Save the output image
-    cv2.imwrite(os.path.join(app.config["IMAGE_UPLOADS"], 'segmented_image.jpg'), image)
+    cv2.imwrite(os.path.join(app.config["IMAGE_UPLOADS"],
+                             'segmented_image.jpg'), image)
 
 
 def delete_old_files():
@@ -114,17 +119,26 @@ def main_page():
 
 @app.route('/generate_image', methods=['POST'])
 def generate_image():
-    inference_pipe = StableDiffusionPipeline.from_pretrained(
-            IMAGE_MODEL, torch_dtype=torch.float16).to("cuda")
+    for retry_count in range(MAX_REQUEST_RETRIES):
+        try:
+            inference_pipe = StableDiffusionPipeline.from_pretrained(
+                    IMAGE_MODEL, torch_dtype=torch.float16).to("cuda")
 
-    image = inference_pipe(
-        get_prompt(request.form["prompt"]),
-        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
-        num_inference_steps=int(request.form["inferenceSteps"]),
-        guidance_scale=float(request.form["guidanceScale"])
-        ).images[0]
-
-    return jsonify({"image_url": save_image(image)})
+            image = inference_pipe(
+                get_prompt(request.form["prompt"]),
+                negative_prompt=get_negative_prompt(
+                    request.form["negativePrompt"]),
+                num_inference_steps=int(request.form["inferenceSteps"]),
+                guidance_scale=float(request.form["guidanceScale"])
+                ).images[0]
+            return jsonify({"image_url": save_image(image)})
+        except RuntimeError:
+            print("CUDA out-of-memory error when generating, retrying...")
+            del inference_pipe
+            if retry_count < MAX_REQUEST_RETRIES - 1:
+                time.sleep(RETRY_DELAY)
+            else:
+                return "CUDA out-of-memory error: Please try again later.", 503
 
 
 @app.route('/upload_image', methods=['POST'])
@@ -135,65 +149,88 @@ def upload_image():
 
 @app.route('/upscale_image', methods=['POST'])
 def upscale_image():
-    upscale_pipeline = StableDiffusionUpscalePipeline.from_pretrained(
-        UPSCALE_MODEL, torch_dtype=torch.float16).to("cuda")
-    upscale_pipeline.enable_xformers_memory_efficient_attention()
+    for retry_count in range(MAX_REQUEST_RETRIES):
+        try:
+            upscale_pipeline = StableDiffusionUpscalePipeline.from_pretrained(
+                UPSCALE_MODEL, torch_dtype=torch.float16).to("cuda")
+            upscale_pipeline.enable_xformers_memory_efficient_attention()
 
-    init_img = Image.open(request.form["image_url"]).convert("RGB")
-    init_img = init_img.resize(UPSCALE_RES)
+            init_img = Image.open(request.form["image_url"]).convert("RGB")
+            init_img = init_img.resize(UPSCALE_RES)
 
-    upscaled_image = upscale_pipeline(
-        prompt=get_prompt(request.form["prompt"]),
-        image=init_img,
-        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
-        num_inference_steps=int(request.form["inferenceSteps"]),
-        guidance_scale=float(request.form["guidanceScale"])
-    ).images[0]
-    return jsonify({"image_url": save_image(upscaled_image)})
+            upscaled_image = upscale_pipeline(
+                prompt=get_prompt(request.form["prompt"]),
+                image=init_img,
+                negative_prompt=get_negative_prompt(
+                    request.form["negativePrompt"]),
+                num_inference_steps=int(request.form["inferenceSteps"]),
+                guidance_scale=float(request.form["guidanceScale"])
+            ).images[0]
+            return jsonify({"image_url": save_image(upscaled_image)})
+        except RuntimeError:
+            print("CUDA out-of-memory error when upscaling, retrying...")
+            del upscale_pipeline
+            if retry_count < MAX_REQUEST_RETRIES - 1:
+                time.sleep(RETRY_DELAY)
+            else:
+                return "CUDA out-of-memory error: Please try again later.", 503
 
 
 @app.route('/inpaint_image', methods=['POST'])
 def inpaint_image():
-    inpainting_pipeline = StableDiffusionInpaintPipeline.from_pretrained(
-        INPAINT_MODEL, torch_dtype=torch.float16).to("cuda")
-    inpainting_pipeline.enable_xformers_memory_efficient_attention()
+    for retry_count in range(MAX_REQUEST_RETRIES):
+        try:
+            inpainting_pipeline = \
+                StableDiffusionInpaintPipeline.from_pretrained(
+                    INPAINT_MODEL, torch_dtype=torch.float16).to("cuda")
+            inpainting_pipeline.enable_xformers_memory_efficient_attention()
 
-    init_img = Image.open(request.form["image_url"]).convert("RGB")
-    decoded_mask = base64.b64decode(request.form["mask"])
-    height, width = init_img.size
-    mask_array = np.frombuffer(decoded_mask, dtype=np.uint8)
-    mask_array = mask_array.reshape(width, height) * 255
-    mask_img = Image.fromarray(mask_array).convert("RGB")
-    init_img = resize_image(init_img, MAX_INPAINT_RES)
-    mask_img = mask_img.resize(init_img.size)
+            init_img = Image.open(request.form["image_url"]).convert("RGB")
+            decoded_mask = base64.b64decode(request.form["mask"])
+            height, width = init_img.size
+            mask_array = np.frombuffer(decoded_mask, dtype=np.uint8)
+            mask_array = mask_array.reshape(width, height) * 255
+            mask_img = Image.fromarray(mask_array).convert("RGB")
+            init_img = resize_image(init_img, MAX_INPAINT_RES)
+            mask_img = mask_img.resize(init_img.size)
 
-    inpainted_image = inpainting_pipeline(
-        prompt=get_prompt(request.form["prompt"]),
-        height=init_img.size[1],
-        width=init_img.size[0],
-        image=init_img,
-        mask_image=mask_img,
-        negative_prompt=get_negative_prompt(request.form["negativePrompt"]),
-        num_inference_steps=int(request.form["inferenceSteps"]),
-        guidance_scale=float(request.form["guidanceScale"])
-    ).images[0]
-
-    return jsonify({"image_url": save_image(inpainted_image)})
+            inpainted_image = inpainting_pipeline(
+                prompt=get_prompt(request.form["prompt"]),
+                height=init_img.size[1],
+                width=init_img.size[0],
+                image=init_img,
+                mask_image=mask_img,
+                negative_prompt=get_negative_prompt(
+                    request.form["negativePrompt"]),
+                num_inference_steps=int(request.form["inferenceSteps"]),
+                guidance_scale=float(request.form["guidanceScale"])
+            ).images[0]
+            return jsonify({"image_url": save_image(inpainted_image)})
+        except RuntimeError:
+            print("CUDA out-of-memory error when inpainting, retrying...")
+            del inpainting_pipeline
+            if retry_count < MAX_REQUEST_RETRIES - 1:
+                time.sleep(RETRY_DELAY)
+            else:
+                return "CUDA out-of-memory error: Please try again later.", 503
 
 
 @app.route('/segment_image', methods=['POST'])
 def segment_image():
-    img = cv2.imread(request.form["image_url"])
-    sam = sam_model_registry["vit_h"](checkpoint=SEGMENT_MODEL)
-    sam.to("cuda")
-    mask_generator = SamAutomaticMaskGenerator(sam)
-    masks = mask_generator.generate(img)
-    for item in masks:
-        item["segmentation"] = item["segmentation"].tolist()
-    save_segmented_image(img, masks)
-    return jsonify(
-        {"image_mask": masks}
-    )
+    try:
+        img = cv2.imread(request.form["image_url"])
+        sam = sam_model_registry["vit_h"](checkpoint=SEGMENT_MODEL)
+        sam.to("cuda")
+        mask_generator = SamAutomaticMaskGenerator(sam)
+        masks = mask_generator.generate(img)
+        for item in masks:
+            item["segmentation"] = item["segmentation"].tolist()
+        save_segmented_image(img, masks)
+        return jsonify({"image_mask": masks})
+    except RuntimeError:
+        print("CUDA out-of-memory error when segmenting, cancelling operation")
+        del mask_generator
+        return jsonify({"image_mask": []})
 
 
 @app.route("/images/<path:filename>")
