@@ -1,11 +1,10 @@
 from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
 from diffusers import StableDiffusionInpaintPipeline
 from flask import Flask, render_template, request, jsonify, send_from_directory
-from PIL import Image
+from PIL import Image, ImageOps
 from hashlib import md5
 from datetime import datetime, timedelta
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
-from torch.cuda import OutOfMemoryError
 import cv2
 import os
 import time
@@ -73,8 +72,16 @@ def delete_old_files():
     time.sleep(3600)
 
 
+def rotate_image(image):
+    return ImageOps.exif_transpose(image)
+
+
 def save_image(image):
     filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+
+    # Rotate images if needed
+    image = rotate_image(image)
+
     image.save(
         os.path.join(app.config["IMAGE_UPLOADS"], filename),
         'JPEG',
