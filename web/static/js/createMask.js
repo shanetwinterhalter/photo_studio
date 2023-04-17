@@ -4,7 +4,6 @@ let brushMask;
 let segmentMask;
 let toolMode;
 let painting = false;
-const brushSize = 10; // Set your desired brush size
 const brushCap = "round";
 const maskColor = "rgba(255, 255, 255, 0.75)";
 
@@ -53,6 +52,7 @@ function draw(e) {
     const canvasRect = $("#canvas")[0].getBoundingClientRect();
     const x = Math.floor(e.clientX - canvasRect.left);
     const y = Math.floor(e.clientY - canvasRect.top);
+    let brushSize = $("#brushSizeSlider").val();
 
     ctx.lineWidth = brushSize;
     ctx.lineCap = brushCap;

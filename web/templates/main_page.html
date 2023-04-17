@@ -27,17 +27,22 @@
             </div>
             <div>
                 <p>Number of inference steps:</p>
-                <input type="range" min="0" max="100" value="{{ DEFAULTARGS.inferenceSteps }}" id="stepsSlider" oninput="updateStepsValue(this.value)">
+                <input type="range" min="0" max="100" value="{{ DEFAULTARGS.inferenceSteps }}" id="stepsSlider" oninput="updateValue(this.id, this.value)">
                 <span id="stepsValue">{{ DEFAULTARGS.inferenceSteps }}</span>
             </div>
             <div>
                 <p>Guidance scale:</p>
-                <input type="range" min="0" max="30" value="{{ DEFAULTARGS.guidanceScale }}" id="guidanceSlider" oninput="updateGuidanceValue(this.value)">
+                <input type="range" min="0" max="30" value="{{ DEFAULTARGS.guidanceScale }}" id="guidanceSlider" oninput="updateValue(this.id, this.value)">
                 <span id="guidanceValue">{{ DEFAULTARGS.guidanceScale }}</span>
             </div>
             <div>
+                <p>Brush size:</p>
+                <input type="range" min="1" max="100" value="10" id="brushSizeSlider" oninput="updateValue(this.id, this.value)">
+                <span id="brushValue">10</span>
+            </div>
+            <div>
                 <button id="brushIcon" class="icon-button">
-                    <i class="fa fa-paint-brush" aria-hiudden="true"></i>
+                    <i class="fa fa-paint-brush" aria-hidden="true"></i>
                 </button>
                 <button id="maskIcon" class="icon-button">
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -45,8 +50,8 @@
             </div>
             <div>
                 <button id="generateImageButton" class="submitButton" type="button">Generate new image</button>
-                <button id="upscaleImageButton" class="submitButton" type="button">Upscale loaded image</button>
-                <button id="inpaintButton" class="submitButton" type="button">Update loaded image</button>
+                <button id="upscaleImageButton" class="submitButton" type="button" disabled>Upscale loaded image</button>
+                <button id="inpaintButton" class="submitButton" type="button" disabled>Update loaded image</button>
             </div>
         </div>
         <h2>Save Image</h2>
@@ -66,12 +71,9 @@
 </body>
 <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
-    function updateStepsValue(value) {
-        document.getElementById('stepsValue').innerText = value;
-    }
-
-    function updateGuidanceValue(value) {
-        document.getElementById('guidanceValue').innerText = value;
+    function updateValue(elementId, value) {
+        const outputId = elementId.replace("Slider", "Value");
+        document.getElementById(outputId).innerText = value;
     }
 </script>
 </html>
