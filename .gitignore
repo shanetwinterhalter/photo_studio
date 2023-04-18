@@ -5,3 +5,4 @@ models
 testing.ipynb
 web/images
 .vscode
+*.code-workspace
