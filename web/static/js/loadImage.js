@@ -35,9 +35,10 @@ export function generateImage() {
     disableUi(true);
 
     $.ajax({
-        url: "/generate_image",
+        url: "/call_model",
         method: "POST",
         data: {
+            action: "generate",
             prompt: $("#imgPrompt").val(),
             negativePrompt: $("#negativePrompt").val(),
             inferenceSteps: $("#stepsSlider").val(),
@@ -56,14 +57,14 @@ export function generateImage() {
 
 export function generateSegmentMask() {    
     $.ajax({
-        url: "/segment_image",
+        url: "/call_model",
         method: "POST",
         data: {
+            action: "segment",
             image_url: $("#resultImage").attr("src")
         },
         success: function (response) {
             eventBus.dispatchEvent(new CustomEvent("masksDataReceived", { detail: response.image_mask }));
-            console.log("Image segmentation complete")
         },
         error: function (error) {
             console.log(error);

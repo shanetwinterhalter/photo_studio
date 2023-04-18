@@ -38,9 +38,10 @@ export function upscaleImage() {
     disableUi(true);
 
     $.ajax({
-        url: "/upscale_image",
+        url: "/call_model",
         method: "POST",
         data: {
+            action: "upscale",
             prompt: $("#imgPrompt").val(),
             image_url: $("#resultImage").attr("src"),
             negativePrompt: $("#negativePrompt").val(),
@@ -69,9 +70,10 @@ export function inpaintImage() {
     const maskBase64 = maskToBase64(mask);
 
     $.ajax({
-        url: "/inpaint_image",
+        url: "/call_model",
         method: "POST",
         data: {
+            action: "inpaint",
             prompt: $("#imgPrompt").val(),
             image_url: $("#resultImage").attr("src"),
             mask: maskBase64,
