@@ -54,8 +54,3 @@ canvas {
   top: 0;
   left: 0;
 }
-
-.icon-button.active {
-  background-color: #3498db;
-  color: #fff;
-}

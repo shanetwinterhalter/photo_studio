@@ -18,7 +18,7 @@ eventBus.addEventListener("masksDataReceived", function (event) {
 });
 
 function getActiveEditButton() {
-    const activeButton = $(".icon-button.active");
+    const activeButton = $(".edit-type:checked");
     if (activeButton.attr("id") === "brushIcon") {
         return "brush";
     } else if (activeButton.attr("id") === "maskIcon") {

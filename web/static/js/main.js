@@ -9,10 +9,13 @@ $("#uploadImageForm").on("submit", function (event) {
     uploadImage();
 });
 
-// When image generated
-$("#generateImageButton").on("click", function (event) {
-    generateImage();
-});
+$(document).ready(function() {
+    // When image generated
+    $("#generateImageButton").on("click", function () {
+        console.log("generate image");
+        generateImage();
+    });
+})
 
 // Listener to request segment mask whenever image updated
 const observer = new MutationObserver((mutations) => {
@@ -41,10 +44,4 @@ $("#upscaleImageButton").on("click", function() {
 // On image saving
 $("#saveImageButton").on("click", function() {
     configureSaveButton();
-});
-
-// Make edit icons exclusive
-$(".icon-button").on("click", function () {
-    $(".icon-button").removeClass("active");
-    $(this).addClass("active");
 });

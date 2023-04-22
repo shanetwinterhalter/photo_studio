@@ -2,9 +2,10 @@ DEFAULTARGS = {
     "prompt": "a portrait photo of a shane man, handsome, " +
               "clear skin, photograph, photorealistic, well lit",
     "inferenceSteps": "15",
-    "guidanceScale": "7.5",
+    "guidanceScale": "25",
     "negativePrompt": "bad, deformed, ugly, bad anatomy, cartoon, " +
-                      "animated, scary, wrinkles, duplicate, double"
+                      "animated, scary, wrinkles, duplicate, double",
+    "brushSize": "10",
 }
 
 IMAGE_MODEL = "../models/shane9r"
