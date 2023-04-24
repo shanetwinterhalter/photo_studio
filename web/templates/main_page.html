@@ -26,52 +26,72 @@
             </div>
         </div>
     </div>
-    <div id="sidebar"> 
-        <h5>Image Editing</h5>
-        <div>
-            <div class="py-1">
-                <p>Prompt:</p>
-                <input type="text" id="imgPrompt" name="img_prompt" placeholder="Enter a prompt">
-            </div>
-            <div class="py-1">
-                <p>Negative Prompt:</p>
-                <input type="text" id="negativePrompt" name="negative_prompt" placeholder="Enter a negative prompt">
-            </div>
-            <div class="py-1">
-                <label for="brushSizeSlider" class="form-label">Brush size: <span id="brushSizeValue">{{ DEFAULTARGS.brushSize }}</span></label>
-                <input type="range" class="form-range" min="1" max="100" value="{{ DEFAULTARGS.brushSize }}" id="brushSizeSlider" oninput="updateValue(this.id, this.value)">
-            </div>
-            <div class="btn-group py-1" role="group" aria-label="Button group">
-                <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="brushIcon" autocomplete="off">
-                <label class="btn btn-outline-primary" for="brushIcon">
-                    <i class="fa fa-paint-brush" aria-hidden="true"></i>
-                </label>
-                <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="maskIcon"  autocomplete="off">
-                <label class="btn btn-outline-primary" for="maskIcon">
-                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                </label>
-            </div>
-            <div class="btn-group py-1" role="group" aria-label="Image editing buttons">
-                <button id="generateImageButton" class="submitButton btn btn-primary btn-md" type="button">Generate</button>
-                <button id="upscaleImageButton" class="submitButton btn btn-primary btn-md" type="button" disabled>Upscale</button>
-                <button id="inpaintButton" class="submitButton btn btn-primary btn-md" type="button" disabled>Update</button>
-            </div>
-            <div class="w-100 py-1" role="group" aria-label="Image upload or save buttons">
-                <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#imageModal">
-                    Upload
-                </button>
-                <button type="button" class="btn btn-primary btn-md" id="saveImageButton" >Save</button>
-            </div>
+    <div id="sidebar">
+        <div id="uiSectionSelectors" class="btn-group-vertical sticky" role="group" aria-label="Button group">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#createImageOptions">
+                <i class="fa fa-upload"></i>
+            </button>
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#imagePromptingOptions">
+                <i class="fa fa-comment"></i>
+            </button>
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#editImageOptions">
+                <i class="fa fa-paint-brush"></i>
+            </button>
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions">
+                <i class="fa fa-cogs"></i>
+            </button>
+            <button class="btn btn-link" type="button" id="saveImageButton" >
+                <i class="fa fa-download"></i>
+            </button>
         </div>
-        <hr class="bg-dark border-dark">
-        <div>
-            <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="collapseAdvancedOptions" style="cursor: pointer;">
-                <h5 class="mb-0">Advanced Options</h5>
-                <button class="btn btn-link" type="button" >
-                    <i class="fa fa-plus"></i>
-                </button>
+    </div>
+    <div id="userOptions" style="display: none;">
+        <div class="sticky">
+            <div id="createImageOptions" class="user-input-section collapse">
+                <h5>Image Loading</h5>
+                <div>
+                    <button id="generateImageButton" class="submitButton btn btn-primary btn-md" type="button">
+                        Generate
+                    </button>
+                    <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#imageModal">
+                        Upload
+                    </button>
+                </div>
             </div>
-            <div class="collapse" id="advancedOptions">
+            <div id="imagePromptingOptions" class="user-input-section collapse">
+                <h5>Image Prompting</h5>
+                <div class="py-1">
+                    <label for="imgPrompt" class="form-label">Prompt</label>
+                    <textarea class="form-control" id="imgPrompt" rows="3" placeholder="Enter a prompt"></textarea>
+                </div>
+                <div class="py-1">
+                    <label for="negativePrompt" class="form-label">Negative Prompt</label>
+                    <textarea class="form-control" id="negativePrompt" rows="3" placeholder="Enter a negative prompt"></textarea>
+                </div>
+            </div>
+            <div id="editImageOptions" class="user-input-section collapse">
+                <h5>Image Editing</h5>
+                <div class="py-1">
+                    <label for="brushSizeSlider" class="form-label">Brush size: <span id="brushSizeValue">{{ DEFAULTARGS.brushSize }}</span></label>
+                    <input type="range" class="form-range" min="1" max="100" value="{{ DEFAULTARGS.brushSize }}" id="brushSizeSlider" oninput="updateValue(this.id, this.value)">
+                </div>
+                <div class="btn-group py-1" role="group" aria-label="Button group">
+                    <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="brushIcon" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="brushIcon">
+                        <i class="fa fa-paint-brush" aria-hidden="true"></i>
+                    </label>
+                    <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="maskIcon"  autocomplete="off">
+                    <label class="btn btn-outline-primary" for="maskIcon">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    </label>
+                </div>
+                <div class="btn-group py-1" role="group" aria-label="Image editing buttons">
+                    <button id="upscaleImageButton" class="submitButton btn btn-primary btn-md" type="button" disabled>Upscale</button>
+                    <button id="inpaintButton" class="submitButton btn btn-primary btn-md" type="button" disabled>Update</button>
+                </div>
+            </div>
+            <div id="advancedOptions" class="user-input-section collapse">
+                <h5 class="mb-0">Advanced Options</h5>
                 <div>
                     <label for="stepsSlider" class="form-label">Inference steps: <span id="stepsValue">{{ DEFAULTARGS.inferenceSteps }}</span></label>
                     <input type="range" class="form-range" min="1" max="100" step="1" value="{{ DEFAULTARGS.inferenceSteps }}" id="stepsSlider" oninput="updateValue(this.id, this.value)">

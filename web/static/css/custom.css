@@ -1,12 +1,19 @@
 body {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 #sidebar {
-  width: 300px;
-  padding: 20px;
   border-right: 1px solid #ccc;
+}
+
+#userOptions {
+  border-right: 1px solid #ccc;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
 }
 
 #content {
@@ -53,4 +60,43 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.image-background {
+  background-color: #4a4a4a;
+  width: 100%;
+  height: auto;
+}
+
+.ui-group {
+  width: auto;
+  border-right: 1px solid #ccc;
+}
+
+
+.ui-group.collapsing {
+  width: 0 !important;
+}
+
+.selected-button {
+  background-color: #007bff;
+  color: white;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.selected-button:hover,
+.selected-button:focus {
+    background-color: #007bff;
+    color: white;
+}
+
+.user-input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
 }
