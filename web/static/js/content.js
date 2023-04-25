@@ -1,5 +1,6 @@
 import { initPanning } from './editImage.js'
 import { configureCanvas } from './canvas.js'
+import { callModel } from './serverRequests.js'
 
 function imageUpdateListener() {
     // Listener for changes to display Image
@@ -7,7 +8,7 @@ function imageUpdateListener() {
         mutations.forEach((mutation) => {
             if (mutation.type === "attributes" && mutation.attributeName === "src") {
                 // TODO: Re-enable segment masks
-                generateSegmentMask();
+                callModel("segment");
                 initPanning();
                 configureCanvas();
             }
