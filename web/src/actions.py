@@ -6,6 +6,7 @@ from cv2 import imread
 from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
 from diffusers import StableDiffusionInpaintPipeline
 from .image_fns import save_image, resize_image, save_segmented_image
+from io import BytesIO
 from PIL import Image
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 from torch import float16
@@ -87,3 +88,9 @@ def segment_image(config):
         item["segmentation"] = item["segmentation"].tolist()
     save_segmented_image(img, masks)
     return {"image_mask": masks}
+
+
+def upload_image(config):
+    image_data = BytesIO(b64decode(config["image"].split(",")[1]))
+    image = Image.open(image_data).convert('RGB')
+    return {"image_url": save_image(image)}

@@ -10,24 +10,15 @@ function isAnyButtonSelected() {
     return isSelected;
 }
 
-export function updateImage(imageUrl) {
-    const img = $("#resultImage")
-    img.attr("src", imageUrl);
-    img.show();
-}
-
-export function disableUi(enable) {
-    if (enable) {
-        $("#loadedImageDisplay").show();
-        $(".submitButton").prop("disabled", true);
-        $("#loader").show();
+function showExtendedOptions() {
+    if (isAnyButtonSelected()) {
+        $("#userOptions").show();
     } else {
-        $("#loader").hide();
-        $(".submitButton").prop("disabled", false);
+        $("#userOptions").hide();
     }
 }
 
-export function setUserOptionsWidth() {
+function setUserOptionsWidth() {
     const userOptions = $("#userOptions");
     const children = userOptions.find(".user-input-section");
     let maxWidth = 0;
@@ -46,10 +37,19 @@ export function setUserOptionsWidth() {
     userOptions.hide();
 }
 
-export function checkSidebarConfiguration() {
-    if (isAnyButtonSelected()) {
-        $("#userOptions").show();
-    } else {
-        $("#userOptions").hide();
-    }
+function configureSelectedButtons() {
+    // Select all buttons in the sidebar and attach a click event handler
+    $("#sidebar .btn").on("click", function () {
+        if ($(this).hasClass("selected-button")) {
+            $(this).removeClass("selected-button");
+        } else {
+            $(this).addClass("selected-button");
+        }
+        showExtendedOptions();
+    });
+}
+
+export function configureSidebarUi () {
+    setUserOptionsWidth();
+    configureSelectedButtons();
 }

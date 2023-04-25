@@ -1,4 +1,4 @@
-from src.actions import generate_image, segment_image
+from src.actions import generate_image, segment_image, upload_image
 from src.actions import upscale_image, inpaint_image
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from src.image_fns import save_image
@@ -18,12 +18,6 @@ def main_page():
                            DEFAULTARGS=appconfig.DEFAULTARGS)
 
 
-@app.route('/upload_image', methods=['POST'])
-def upload_image():
-    image = Image.open(request.files["image"].stream).convert('RGB')
-    return jsonify({"image_url": save_image(image)})
-
-
 @app.route("/images/<path:filename>")
 def serve_image(filename):
     return send_from_directory(appconfig.IMAGE_UPLOADS, filename)
@@ -35,7 +29,9 @@ def call_model():
     print(action)
     for retry_count in range(appconfig.MAX_REQUEST_RETRIES):
         try:
-            if action == "generate":
+            if action == "upload":
+                response = upload_image(request.form)
+            elif action == "generate":
                 response = generate_image(request.form)
             elif action == "segment":
                 response = segment_image(request.form)

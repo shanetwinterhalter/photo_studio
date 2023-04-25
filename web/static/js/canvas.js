@@ -1,4 +1,5 @@
 import { eventBus } from "./eventBus.js";
+import { getActiveEditButton } from "./editImage.js";
 
 let brushMask;
 let segmentMask;
@@ -16,17 +17,6 @@ let currentSegmentIndex = 0;
 eventBus.addEventListener("masksDataReceived", function (event) {
     segmentationMasks = event.detail;
 });
-
-function getActiveEditButton() {
-    const activeButton = $(".edit-type:checked");
-    if (activeButton.attr("id") === "brushIcon") {
-        return "brush";
-    } else if (activeButton.attr("id") === "maskIcon") {
-        return "segment";
-    } else {
-        return null;
-    }
-}
 
 function startPosition(e, toolMode) {
     painting = true;
