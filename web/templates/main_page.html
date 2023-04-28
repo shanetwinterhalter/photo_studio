@@ -57,9 +57,6 @@
             <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#createImageOptions">
                 <i class="fa fa-upload"></i>
             </button>
-            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#imagePromptingOptions">
-                <i class="fa fa-comment"></i>
-            </button>
             <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#editImageOptions">
                 <i class="fa fa-paint-brush"></i>
             </button>
@@ -84,8 +81,8 @@
                     </button>
                 </div>
             </div>
-            <div id="imagePromptingOptions" class="user-input-section collapse">
-                <h5>Image Prompting</h5>
+            <div id="editImageOptions" class="user-input-section collapse">
+                <h5>Image Editing</h5>
                 <div class="py-1">
                     <label for="imgPrompt" class="form-label">Prompt</label>
                     <textarea class="form-control" id="imgPrompt" rows="3" placeholder="Enter a prompt"></textarea>
@@ -94,9 +91,6 @@
                     <label for="negativePrompt" class="form-label">Negative Prompt</label>
                     <textarea class="form-control" id="negativePrompt" rows="3" placeholder="Enter a negative prompt"></textarea>
                 </div>
-            </div>
-            <div id="editImageOptions" class="user-input-section collapse">
-                <h5>Image Editing</h5>
                 <div class="py-1">
                     <label for="brushSizeSlider" class="form-label">Brush size: <span id="brushSizeValue">{{ DEFAULTARGS.brushSize }}</span></label>
                     <input type="range" class="form-range" min="1" max="100" value="{{ DEFAULTARGS.brushSize }}" id="brushSizeSlider" oninput="updateValue(this.id, this.value)">
