@@ -1,4 +1,4 @@
-import { getMask } from './mask.js'
+import { getMask, updateSegmentMask } from './mask.js'
 import { eventBus } from './eventBus.js'
 
 // Prevent user sending multiple server requests
@@ -92,7 +92,7 @@ export async function callModel(action) {
         },
         success: function (response) {
             if (action == "segment") {
-                eventBus.dispatchEvent(new CustomEvent("masksDataReceived", { detail: response.image_mask }));
+                updateSegmentMask(response.image_mask)
             } else {
                 updateImage(response.image_url);
                 disableUi(false);

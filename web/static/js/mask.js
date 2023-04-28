@@ -1,4 +1,5 @@
 import { brushMask, segmentMask } from './canvas.js'
+import { eventBus } from './eventBus.js'
 
 export function getMask() {
     if (brushMask.length != segmentMask.length) {
@@ -11,4 +12,8 @@ export function getMask() {
     }
 
     return result
+}
+
+export function updateSegmentMask(mask) {
+    eventBus.dispatchEvent(new CustomEvent("masksDataReceived", { detail: mask }));
 }
