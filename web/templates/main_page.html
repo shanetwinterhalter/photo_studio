@@ -15,13 +15,38 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadImageModalLabel">Upload or generate image</h5>
+                    <h5 class="modal-title" id="uploadImageModalLabel">Upload image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="uploadImageForm">
                         <input type="file" id="fileUpload" name="file">
                         <input type="submit" class="submitButton btn btn-primary" id="uploadButton" value="Upload" data-bs-dismiss="modal">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="generateModal" tabindex="-1" arialabelledby="generateImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadImageModalLabel">Generate Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="generateImageForm">
+                        <div class="pb-1">
+                            <label for="imgPromptModal" class="form-label">Prompt</label>
+                            <textarea class="form-control" id="imgPromptModal" rows="3" placeholder="Enter a prompt"></textarea>
+                        </div>
+                        <div class="py-1">
+                            <label for="negativePromptModal" class="form-label">Negative Prompt</label>
+                            <textarea class="form-control" id="negativePromptModal" rows="3" placeholder="Enter a negative prompt"></textarea>
+                        </div>
+                        <div class="py-1">
+                            <input type="submit" class="submitButton btn btn-primary" id="generateImageButton" value="Generate" data-bs-dismiss="modal">
+                        </div>
                     </form>
                 </div>
             </div>
@@ -51,10 +76,10 @@
             <div id="createImageOptions" class="user-input-section collapse">
                 <h5>Image Loading</h5>
                 <div>
-                    <button id="generateImageButton" class="submitButton btn btn-primary btn-md" type="button">
+                    <button type="button" class="submitButton btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#generateModal">
                         Generate
                     </button>
-                    <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#imageModal">
+                    <button type="button" class="submitButton btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#imageModal">
                         Upload
                     </button>
                 </div>

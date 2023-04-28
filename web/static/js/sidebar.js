@@ -1,5 +1,5 @@
 import { callModel } from "./serverRequests.js";
-import { configureSidebarUi } from "./sidebarUi.js";
+import { configureSidebarUi, updatePrompts } from "./sidebarUi.js";
 
 function loadImageListeners() {
     // When upload button pressed
@@ -10,6 +10,7 @@ function loadImageListeners() {
 
     // When image generated
     $("#generateImageButton").on("click", function () {
+        updatePrompts();
         callModel("generate");
     });
 }

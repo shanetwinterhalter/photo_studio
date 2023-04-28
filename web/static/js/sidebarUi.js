@@ -49,6 +49,11 @@ function configureSelectedButtons() {
     });
 }
 
+export function updatePrompts() {
+    $("#imgPrompt").val($("#imgPromptModal").val());
+    $("#negativePrompt").val($("#negativePromptModal").val());
+}
+
 export function configureSidebarUi () {
     setUserOptionsWidth();
     configureSelectedButtons();
