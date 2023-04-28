@@ -1,17 +1,19 @@
 export function getActiveEditButton() {
     const activeButton = $(".edit-type:checked");
+    enablePanning(false)
     if (activeButton.attr("id") === "brushIcon") {
         return "brush";
     } else if (activeButton.attr("id") === "maskIcon") {
         return "segment";
     } else {
-        return null;
+        enablePanning(true)
+        return "drag";
     }
 }
 
 // Toggle panning
-export function togglePanning() {
-    if (getActiveEditButton() == null) {
+function enablePanning(enable) {
+    if (enable) {
         $("#zoomContainer").draggable("enable");
     } else {
         $("#zoomContainer").draggable("disable");
@@ -29,5 +31,4 @@ export function initPanning() {
             $(this).css("cursor", "grab");
         }
     });
-    togglePanning();
 }

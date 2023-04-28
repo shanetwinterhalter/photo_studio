@@ -1,6 +1,5 @@
 import { callModel } from "./serverRequests.js";
 import { configureSidebarUi } from "./sidebarUi.js";
-import { togglePanning } from "./editImage.js"
 
 function loadImageListeners() {
     // When upload button pressed
@@ -24,11 +23,6 @@ function editImageListeners() {
     // Upscale image
     $("#upscaleImageButton").on("click", function() {
         callModel("upscale");
-    });
-
-    // Disable panning when any edit icon selected
-    $("#brushIcon, #maskIcon").on("click", function () {
-        togglePanning();
     });
 }
 

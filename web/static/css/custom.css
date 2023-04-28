@@ -7,7 +7,7 @@ body {
 #userOptions {
     z-index: 10;
     border-right: 1px solid #ccc;
-    background: #f8f8f8;
+    background: #ffffff;
 }
 
 .sticky {
@@ -21,6 +21,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f8f8f8;
 }
 
 .loader {

@@ -76,7 +76,11 @@
                     <label for="brushSizeSlider" class="form-label">Brush size: <span id="brushSizeValue">{{ DEFAULTARGS.brushSize }}</span></label>
                     <input type="range" class="form-range" min="1" max="100" value="{{ DEFAULTARGS.brushSize }}" id="brushSizeSlider" oninput="updateValue(this.id, this.value)">
                 </div>
-                <div class="btn-group py-1" role="group" aria-label="Button group">
+                <div id="editIconsBtnGroup" class="btn-group py-1" role="group" aria-label="Button group">
+                    <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="panIcon" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="panIcon">
+                        <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                    </label>
                     <input type="radio" class="btn-check edit-type" name="imageEditRadio" id="brushIcon" autocomplete="off">
                     <label class="btn btn-outline-primary" for="brushIcon">
                         <i class="fa fa-paint-brush" aria-hidden="true"></i>
