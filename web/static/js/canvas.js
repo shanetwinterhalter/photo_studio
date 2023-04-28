@@ -35,13 +35,19 @@ function finishedPosition(toolMode) {
     ctx.beginPath();
 }
 
+function getZoomLevel() {
+    const zoomContainer = $('#zoomContainer');
+    return parseFloat(zoomContainer.css('transform').split(',')[3]) || 1;
+}
+
 function draw(e) {
     if (!painting) return;
     if (toolMode != "brush") return;
 
+    const zoomLevel = getZoomLevel();
     const canvasRect = $("#canvas")[0].getBoundingClientRect();
-    const x = Math.floor(e.clientX - canvasRect.left);
-    const y = Math.floor(e.clientY - canvasRect.top);
+    const x = Math.floor((e.clientX - canvasRect.left) / zoomLevel);
+    const y = Math.floor((e.clientY - canvasRect.top) / zoomLevel);
     let brushSize = $("#brushSizeSlider").val();
 
     ctx.lineWidth = brushSize;
@@ -68,9 +74,10 @@ function draw(e) {
 function applyPredefinedMask(e) {
     if (!segmentationMasks || !segmentationMasks.length) return;
   
+    const zoomLevel = getZoomLevel();
     const canvasRect = canvas.getBoundingClientRect();
-    const x = Math.floor(e.clientX - canvasRect.left);
-    const y = Math.floor(e.clientY - canvasRect.top);
+    const x = Math.floor((e.clientX - canvasRect.left) / zoomLevel);
+    const y = Math.floor((e.clientY - canvasRect.top) / zoomLevel);
   
     const overlappingMasks = segmentationMasks.filter(maskData => {
         const row = maskData.segmentation[y];
