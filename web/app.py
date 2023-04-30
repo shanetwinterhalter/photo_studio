@@ -43,7 +43,7 @@ def call_model():
         except RuntimeError:
             print(retry_count)
             print("CUDA out-of-memory when calling {}".format(action))
-            if retry_count < appconfig.MAX_REQUEST_RETRIES - 1:
+            if (retry_count < appconfig.MAX_REQUEST_RETRIES - 1) and (action != "segment"):
                 sleep(appconfig.RETRY_DELAY)
             else:
                 return "CUDA out-of-memory error: Please try again later.", 503
