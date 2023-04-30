@@ -1,7 +1,38 @@
-import { configureSidebar } from './sidebar.js';
-import { configureContent } from './content.js';
+import { setupUi } from './uiSetup.js'
+import { configureImageUpload } from './imageUpload.js'
+import { configureImageGeneration } from './imageGeneration.js'
+import { configureImageUpscaling } from './imageUpscale.js'
+import { configureImageInpainting } from './imageInpaint.js'
+import { configureImageSaving } from './imageSave.js'
+import { configureImageEditTools } from './imageEditTools.js'
+import { configureImageSegmentation } from './imageSegment.js'
 
 $(document).ready(function () {
-    configureSidebar();
-    configureContent();
+    // Initial UI setup
+    setupUi();
+
+    // Image upload
+    configureImageUpload();
+
+    // Image generation
+    configureImageGeneration();
+
+    // Image Upscale
+    configureImageUpscaling();
+
+    // Image Inpaint
+    configureImageInpainting();
+
+    // Image Save
+    configureImageSaving();
+
+    // Open load image modal
+    $("#imageModal").modal("show");
+
+    // Configure image segmentation
+    //configureImageSegmentation();
+
+    // Content
+    configureImageEditTools();
+
 });

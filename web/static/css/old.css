@@ -1,0 +1,60 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#sidebar,
+#userOptions {
+    z-index: 10;
+    border-right: 1px solid #ccc;
+    background: #ffffff;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+}
+
+#content {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+}
+
+
+#resultImage {
+  image-rendering: optimizeQuality;
+  -ms-interpolation-mode: bicubic;
+}
+
+#imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.image-background {
+  background-color: #4a4a4a;
+  width: 100%;
+  height: auto;
+}
+
+#zoomContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+

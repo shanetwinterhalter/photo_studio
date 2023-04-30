@@ -1,16 +1,16 @@
-import { eventBus } from "./eventBus.js";
-import { getActiveEditButton } from "./editImage.js";
+import { toggleImagePanning, getZoomLevel } from './utils/uiUtils.js'
+import { eventBus } from './utils/maskUtils.js'
 
-let brushMask;
-let segmentMask;
-let toolMode;
 let painting = false;
+let toolMode;
+
 const brushCap = "round";
 const maskColor = "rgba(255, 255, 255, 0.75)";
 
-let canvas;
-let ctx;
-let img;
+const canvas = $("#canvas")[0];
+const ctx = canvas.getContext("2d");
+const img = $("#resultImage")[0];
+let mask = new Array(img.naturalWidth * img.naturalHeight).fill(0);
 
 let segmentationMasks;
 let currentSegmentIndex = 0;
@@ -33,11 +33,6 @@ function finishedPosition(toolMode) {
     painting = false;
     if (toolMode != "brush") return;
     ctx.beginPath();
-}
-
-function getZoomLevel() {
-    const zoomContainer = $('#zoomContainer');
-    return parseFloat(zoomContainer.css('transform').split(',')[3]) || 1;
 }
 
 function draw(e) {
@@ -132,17 +127,24 @@ function applyPredefinedMask(e) {
     }
 }
 
-export function configureCanvas() {
-    canvas = $("#canvas")[0];
-    ctx = canvas.getContext("2d");
-    img = $("#resultImage")[0];
+function getActiveEditButton() {
+    const activeButton = $('input[name="imageEditRadio"]:checked').attr('id');
+    toggleImagePanning(false)
+    if (activeButton === "brushIcon") {
+        return "brush";
+    } else if (activeButton === "maskIcon") {
+        return "segment";
+    } else {
+        toggleImagePanning(true)
+        return "drag";
+    }
+}
 
+function configureCanvas() {
     img.addEventListener("load", function () {
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        brushMask = new Array(img.naturalWidth * img.naturalHeight).fill(0);
-        segmentMask = new Array(img.naturalWidth * img.naturalHeight).fill(0);
-
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
         canvas.addEventListener("mousedown", function(e) {
             toolMode = getActiveEditButton();
             startPosition(e, toolMode);
@@ -152,10 +154,25 @@ export function configureCanvas() {
             finishedPosition(toolMode);
         });
         canvas.addEventListener("mousemove", function (e) {
-            toolMode = getActiveEditButton();
             draw(e);
         });
     })
 }
 
-export { brushMask, segmentMask }
+export function configureImageEditTools() {
+    // Configure canvas whenever image is updated
+    const observer = new MutationObserver((mutationsList, observer) => {
+        // check if the src attribute has changed
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                configureCanvas();
+                break;
+            }
+        }
+    });
+
+    // configure the observer to watch for changes to the src attribute
+    observer.observe($("#resultImage").get(0), { attributes: true, attributeFilter: ['src'] });
+}
+
+export { mask }

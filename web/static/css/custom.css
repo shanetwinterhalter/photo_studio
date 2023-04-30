@@ -1,30 +1,54 @@
 body {
-  display: flex;
-  min-height: 100vh;
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* CSS for main UI elements */
+/* For the sidebar */
+#optionGroups {
+  min-width: 4vh;
+}
+
+#userOptions {
+  min-width: 20vh;
+  text-align: center;
+}
+
+.sidebar {
+  border-right: 1px solid #ccc;
+  background: #ffffff;
+  z-index: 10;
+  height: 100vh;
+}
+
+.main-content-group {
   overflow: hidden;
 }
 
-#sidebar,
-#userOptions {
-    z-index: 10;
-    border-right: 1px solid #ccc;
-    background: #ffffff;
+/* Set collapse duration to 0s */
+#userOptions * {
+  transition: none;
 }
 
-.sticky {
-  position: sticky;
-  top: 0;
-}
-
-#content {
-  flex-grow: 1;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* For image section */
+#imageContent {
   background: #f8f8f8;
+  display: flex;
+  flex-grow: 1;
 }
 
+#zoomContainer {
+  display: flex;
+  position: absolute;
+  height: 100%;
+}
+
+#canvas {
+  position: absolute;
+}
+
+/* Loading element */
 .loader {
   border: 10px solid #f3f3f3;
   border-top: 10px solid #3498db;
@@ -43,48 +67,16 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-#resultImage {
-  image-rendering: optimizeQuality;
-  -ms-interpolation-mode: bicubic;
+
+/* Individual element styling */
+.custom-line {
+    border: 0; /* Remove default border */
+    border-top: 1px solid #a2a2a2; /* Add a 1px solid line */
+    width: 90%; /* Adjust the width as needed, e.g., 80% */
+    margin: 10px auto; /* Center the line and add space between elements */
 }
 
-#imageContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.image-background {
-  background-color: #4a4a4a;
-  width: 100%;
-  height: auto;
-}
-
-#zoomContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.ui-group {
-  width: auto;
-  border-right: 1px solid #ccc;
-}
-
-
-.ui-group.collapsing {
-  width: 0 !important;
-}
-
+/* Configure sidebar buttons when selected */
 .selected-button {
   background-color: #007bff;
   color: white;
@@ -98,12 +90,4 @@ canvas {
 .selected-button:focus {
     background-color: #007bff;
     color: white;
-}
-
-.user-input-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 20px;
 }
