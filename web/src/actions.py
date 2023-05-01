@@ -62,6 +62,8 @@ def inpaint_image(config):
     mask_img = Image.fromarray(mask_array).convert("RGB")
     init_img = resize_image(init_img, appconfig.MAX_INPAINT_RES)
     mask_img = mask_img.resize(init_img.size)
+    save_image(mask_img, "mask_image.jpeg", debug=True)
+    save_image(init_img, "initial_image.jpeg", debug=True)
 
     inpainted_image = inpainting_pipeline(
         prompt=get_prompt(config["prompt"]),
@@ -74,7 +76,7 @@ def inpaint_image(config):
         num_inference_steps=int(config["inferenceSteps"]),
         guidance_scale=float(config["guidanceScale"])
     ).images[0]
-
+    save_image(inpainted_image, "inpainted_image.jpeg", debug=True)
     return {"image_url": save_image(inpainted_image)}
 
 
@@ -86,7 +88,7 @@ def segment_image(config):
     masks = mask_generator.generate(img)
     for item in masks:
         item["segmentation"] = item["segmentation"].tolist()
-    save_segmented_image(img, masks)
+    save_segmented_image(img, masks, "segmented_image.jpeg", debug=True)
     return {"image_mask": masks}
 
 

@@ -12,22 +12,36 @@ def rotate_image(image):
     return ImageOps.exif_transpose(image)
 
 
-def save_image(image):
-    filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+def save_image(image, filename=None, debug=False):
+    if filename is None:
+        filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+
+    if debug:
+        folder = appconfig.DEBUG_IMAGE_UPLOADS
+    else:
+        folder = appconfig.IMAGE_UPLOADS
 
     # Rotate images if needed
     image = rotate_image(image)
 
     image.save(
-        path.join(appconfig.IMAGE_UPLOADS, filename),
+        path.join(folder, filename),
         'JPEG',
         quality=90
     )
-    image_url = f"{appconfig.IMAGE_UPLOADS}/{filename}"
+    image_url = f"{folder}/{filename}"
     return image_url
 
 
-def save_segmented_image(image, masks):
+def save_segmented_image(image, masks, filename=None, debug=False):
+    if filename is None:
+        filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+
+    if debug:
+        folder = appconfig.DEBUG_IMAGE_UPLOADS
+    else:
+        folder = appconfig.IMAGE_UPLOADS
+
     colors = [tuple([randint(0, 255) for
                      _ in range(3)]) for _ in range(len(masks))]
     for idx, mask in enumerate(masks):
@@ -38,8 +52,8 @@ def save_segmented_image(image, masks):
         # Overlay the color mask on the image
         image = addWeighted(image, 1, color_mask, 0.5, 0)
     # Save the output image
-    imwrite(path.join(appconfig.IMAGE_UPLOADS,
-                      'segmented_image.jpg'), image)
+    imwrite(path.join(folder,
+                      filename), image)
 
 
 def resize_image(image, max_res):
