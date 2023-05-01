@@ -4,5 +4,6 @@ notes.md
 models
 testing.ipynb
 web/images
+web/debug_images
 .vscode
 *.code-workspace
