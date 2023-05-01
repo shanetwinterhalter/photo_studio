@@ -1,4 +1,4 @@
-import { resizeAndRecentreImage } from "./updateImage.js";
+import { resizeAndRecentreImage } from "./utils/uiUtils.js";
 
 function configureSliders() {
     $('.form-range').each(function() {

@@ -1,4 +1,4 @@
-import { toggleImagePanning, getZoomLevel } from './utils/uiUtils.js'
+import { getActiveEditButton, getZoomLevel, resizeCanvas } from './utils/uiUtils.js'
 import { eventBus } from './utils/maskUtils.js'
 
 let painting = false;
@@ -13,6 +13,7 @@ const img = $("#resultImage")[0];
 
 let segmentationMasks;
 let currentSegmentIndex = 0;
+
 eventBus.addEventListener("masksDataReceived", function (event) {
     segmentationMasks = event.detail;
 });
@@ -116,19 +117,6 @@ function draw(e) {
     }
 }*/
 
-function getActiveEditButton() {
-    const activeButton = $('input[name="imageEditRadio"]:checked').attr('id');
-    toggleImagePanning(false)
-    if (activeButton === "brushIcon") {
-        return "brush";
-    } else if (activeButton === "maskIcon") {
-        return "segment";
-    } else {
-        toggleImagePanning(true)
-        return "drag";
-    }
-}
-
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -149,26 +137,6 @@ function configureCanvas() {
             draw(e);
         });
     })
-}
-
-export function resizeCanvas() {
-    const imageRect = img.getBoundingClientRect();
-    const imageWidth = imageRect.width;
-    const imageHeight = imageRect.height;
-
-    // Create a temporary canvas and copy the current canvas content
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.drawImage(canvas, 0, 0);
-
-    // Resize the main canvas
-    canvas.width = imageWidth;
-    canvas.height = imageHeight;
-
-    // Redraw the content from the temporary canvas, scaling it to the new size
-    ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, canvas.width, canvas.height);
 }
 
 export function configureImageEditTools() {

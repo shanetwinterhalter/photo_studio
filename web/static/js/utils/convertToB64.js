@@ -1,11 +1,3 @@
-function arrayToString(arr) {
-    let str = '';
-    for (let i = 0; i < arr.length; i++) {
-        str += String.fromCharCode(arr[i]);
-    }
-    return str;
-}
-
 export function getCanvasBase64() {
     // Create a new canvas with the native dimensions of the image
     const canvas = $("#canvas")[0];
@@ -47,26 +39,6 @@ export function getCanvasBase64() {
     const base64DataUrl = btoa(concatenatedChunks);
 
     return base64DataUrl;
-}
-
-export function getMaskBase64(mask) {
-    const uint8Array = new Uint8Array(mask.map(x => x ? 1 : 0));
-
-    const chunkSize = 8192;
-    const binaryChunks = [];
-
-    for (let i = 0; i < uint8Array.length; i += chunkSize) {
-        const chunk = uint8Array.slice(i, i + chunkSize);
-        const binaryString = arrayToString(chunk);
-        binaryChunks.push(binaryString);
-    }
-
-    const encoder = new TextEncoder();
-    const concatenatedChunks = binaryChunks.reduce((acc, binaryString) => acc + binaryString, '');
-    const uint8ArrayEncoded = encoder.encode(concatenatedChunks);
-
-    const base64Encoded = window.btoa(arrayToString(uint8ArrayEncoded));
-    return base64Encoded;
 }
 
 export function getImageBase64() {

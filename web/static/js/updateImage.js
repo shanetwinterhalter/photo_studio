@@ -1,3 +1,5 @@
+import { resizeAndRecentreImage } from "./utils/uiUtils.js";
+
 function configureImageZoom() {
     // Bind the mousewheel event to the zoomContainer
     $('#zoomContainer').on('wheel', function (e) {
@@ -23,31 +25,6 @@ function configureImagePanning() {
         stop: function (event, ui) {
             $(this).css("cursor", "grab");
         }
-    });
-}
-
-export function resizeAndRecentreImage() {
-    const img = $("#resultImage");
-    const zoomContainer = $("#zoomContainer");
-    let optionsWidth = 0;
-    let sidebarWidth = $("#optionGroups").width();
-    if (!$("#userOptions").is(":hidden")) {
-        optionsWidth = $("#userOptions").width();
-    }
-    const desiredWidth = window.innerWidth - sidebarWidth;
-    const desiredHeight = window.innerHeight;
-
-    const imgWidth = img.width();
-    const imgHeight = img.height();
-    const scaleX = desiredWidth / imgWidth;
-    const scaleY = desiredHeight / imgHeight;
-    const scale = Math.min(scaleX, scaleY);
-
-    const leftPos = (window.innerWidth + optionsWidth - imgWidth * scale) / 2
-
-    zoomContainer.css({
-        left: leftPos,
-        top: 0,
     });
 }
 

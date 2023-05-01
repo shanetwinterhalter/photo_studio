@@ -4,9 +4,10 @@ import { configureImageGeneration } from './imageGeneration.js'
 import { configureImageUpscaling } from './imageUpscale.js'
 import { configureImageInpainting } from './imageInpaint.js'
 import { configureImageSaving } from './imageSave.js'
-import { configureImageEditTools, resizeCanvas } from './imageEditTools.js'
+import { configureImageEditTools } from './imageEditTools.js'
 import { configureImageSegmentation } from './imageSegment.js'
-import { resizeAndRecentreImage } from './updateImage.js'
+
+import { resizeCanvas, resizeAndRecentreImage } from './utils/uiUtils.js'
 
 $(document).ready(function () {
     // Initial UI setup
