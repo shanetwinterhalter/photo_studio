@@ -12,6 +12,7 @@ const ctx = canvas.getContext("2d");
 const img = $("#resultImage")[0];
 
 let segmentationMasks;
+let previousMask = null;
 let currentSegmentIndex = 0;
 
 eventBus.addEventListener("masksDataReceived", function (event) {
@@ -20,11 +21,10 @@ eventBus.addEventListener("masksDataReceived", function (event) {
 
 function startPosition(e, toolMode) {
     painting = true;
-
     if (toolMode === "brush") {
         draw(e);
     } else if (toolMode === "segment") {
-        currentSegmentIndex = 0;
+        //currentSegmentIndex = 0;
         applyPredefinedMask(e)
     }
 }
@@ -56,14 +56,42 @@ function draw(e) {
     ctx.moveTo(x, y);
 }
 
-/*function applyPredefinedMask(e) {
-    if (!segmentationMasks || !segmentationMasks.length) return;
-  
+function applyMask(segmentMask, clear = false) {
     const zoomLevel = getZoomLevel();
+    const scaleX = canvas.width / img.naturalWidth;
+    const scaleY = canvas.height / img.naturalHeight;
+
+    if (clear && previousMask) {
+        for (let i = 0; i < previousMask.length; i++) {
+            if (previousMask[i]) {
+                const x = i % img.naturalWidth;
+                const y = Math.floor(i / img.naturalWidth);
+                ctx.clearRect(x * scaleX, y * scaleY, scaleX, scaleY);
+            }
+        }
+    }
+
+    for (let i = 0; i < segmentMask.length; i++) {
+        if (segmentMask[i]) {
+            const x = i % img.naturalWidth;
+            const y = Math.floor(i / img.naturalWidth);
+            ctx.fillStyle = maskColor;
+            ctx.fillRect(x * scaleX, y * scaleY, scaleX, scaleY);
+        }
+    }
+
+    previousMask = segmentMask;
+}
+
+function applyPredefinedMask(e) {
+    console.log(currentSegmentIndex)
+    if (toolMode != "segment") return;
+    if (!segmentationMasks || !segmentationMasks.length) return;
     const canvasRect = canvas.getBoundingClientRect();
+    const zoomLevel = getZoomLevel()
     const x = Math.floor((e.clientX - canvasRect.left) / zoomLevel);
     const y = Math.floor((e.clientY - canvasRect.top) / zoomLevel);
-  
+
     const overlappingMasks = segmentationMasks.filter(maskData => {
         const row = maskData.segmentation[y];
         return row && row[x];
@@ -72,50 +100,13 @@ function draw(e) {
     if (!overlappingMasks.length) return;
 
     overlappingMasks.sort((a, b) => a.area - b.area);
-  
+
     const maskData = overlappingMasks[currentSegmentIndex % overlappingMasks.length].segmentation;
     const mask = [].concat(...maskData); // Flatten the 2D array
-  
-    for (let i = 0; i < mask.length; i++) {
-      if (mask[i] && !brushMask[i]) {
-        segmentMask[i] = 1;
-      }
-    }
-
-    // Clear the segmentMask array
-    segmentMask.fill(0);
-
-    for (let i = 0; i < mask.length; i++) {
-        if (mask[i] && !brushMask[i]) {
-          segmentMask[i] = 1;
-        }
-    }
-
+    const clearPreviousMask = currentSegmentIndex > 0;
+    applyMask(mask, clearPreviousMask);
     currentSegmentIndex++;
-  
-    // Redraw the canvas with the updated mask
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-
-    for (let i = 0; i < segmentMask.length; i++) {
-        if (segmentMask[i]) {
-            const x = i % img.naturalWidth;
-            const y = Math.floor(i / img.naturalWidth);
-            ctx.fillStyle = maskColor;
-            ctx.fillRect(x, y, 1, 1);
-        }
-    }
-
-    // Draw brush strokes on top of the segment mask
-    for (let i = 0; i < brushMask.length; i++) {
-        if (brushMask[i]) {
-            const x = (i % img.naturalWidth);
-            const y = Math.floor(i / img.naturalWidth);
-            ctx.fillStyle = maskColor;
-            ctx.fillRect(x, y, 1, 1);
-        }
-    }
-}*/
+}
 
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -9,6 +9,7 @@ function requestImageSegmentation() {
         "segment",
         function (response) {
             updateSegmentMask(response.image_mask);
+            console.log("Segmentation complete");
         },
     );
 }

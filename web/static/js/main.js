@@ -32,7 +32,7 @@ $(document).ready(function () {
     $("#imageModal").modal("show");
 
     // Configure image segmentation
-    //configureImageSegmentation();
+    configureImageSegmentation();
 
     // Content
     configureImageEditTools();
