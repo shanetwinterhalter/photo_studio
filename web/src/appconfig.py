@@ -9,7 +9,9 @@ DEFAULTARGS = {
 }
 
 IMAGE_MODEL = "../models/shane9r"
+
 SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
+MAX_SEGMENT_RES = (1920, 1920)
 
 UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
 UPSCALE_RES = (256, 256)

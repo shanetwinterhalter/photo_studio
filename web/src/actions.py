@@ -81,14 +81,28 @@ def inpaint_image(config):
 
 
 def segment_image(config):
-    img = imread(config["image_url"])
+    img = Image.open(config["image_url"])
+    max_width, max_height = appconfig.MAX_SEGMENT_RES
+    img_width, img_height = img.size
+
+    if img_width > max_width or img_height > max_height:
+        aspect_ratio = float(img_width) / float(img_height)
+        if img_width > img_height:
+            new_width = max_width
+            new_height = int(new_width / aspect_ratio)
+        else:
+            new_height = max_height
+            new_width = int(new_height * aspect_ratio)
+        img = img.resize((new_width, new_height), Image.ANTIALIAS)
+
+    img_array = np.array(img)
     sam = sam_model_registry["vit_h"](checkpoint=appconfig.SEGMENT_MODEL)
     sam.to("cuda")
     mask_generator = SamAutomaticMaskGenerator(sam)
-    masks = mask_generator.generate(img)
+    masks = mask_generator.generate(img_array)
     for item in masks:
         item["segmentation"] = item["segmentation"].tolist()
-    save_segmented_image(img, masks, "segmented_image.jpeg", debug=True)
+    save_segmented_image(img_array, masks, "segmented_image.jpeg", debug=True)
     return {"image_mask": masks}
 
 
