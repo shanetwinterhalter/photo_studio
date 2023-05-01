@@ -1,11 +1,8 @@
 import { callModel } from './utils/serverRequest.js'
 import { updateImage } from './updateImage.js'
-import { getMaskBase64 } from './utils/convertToB64.js';
-import { mask } from './imageEditTools.js'
+import { getCanvasBase64 } from './utils/convertToB64.js';
 
 export function configureImageInpainting() {
-    const maskBase64 = getMaskBase64(mask);
-
     // When upscale button pressed
     $("#inpaintButton").on("click", function () {
         callModel(
@@ -13,8 +10,8 @@ export function configureImageInpainting() {
             function (response) {
                 updateImage(response.image_url);
             },
-            imageBase64 = null,
-            maskBase64 = maskBase64,
+            null,
+            getCanvasBase64(),
             );
     });
 }

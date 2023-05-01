@@ -46,7 +46,6 @@ export function resizeAndRecentreImage() {
     const leftPos = (window.innerWidth + optionsWidth - imgWidth * scale) / 2
 
     zoomContainer.css({
-        transform: `scale(${scale})`,
         left: leftPos,
         top: 0,
     });

@@ -4,8 +4,9 @@ import { configureImageGeneration } from './imageGeneration.js'
 import { configureImageUpscaling } from './imageUpscale.js'
 import { configureImageInpainting } from './imageInpaint.js'
 import { configureImageSaving } from './imageSave.js'
-import { configureImageEditTools } from './imageEditTools.js'
+import { configureImageEditTools, resizeCanvas } from './imageEditTools.js'
 import { configureImageSegmentation } from './imageSegment.js'
+import { resizeAndRecentreImage } from './updateImage.js'
 
 $(document).ready(function () {
     // Initial UI setup
@@ -35,4 +36,9 @@ $(document).ready(function () {
     // Content
     configureImageEditTools();
 
+    // Resize and reconfigure image when window resized
+    window.addEventListener("resize", () => {
+        resizeAndRecentreImage();
+        resizeCanvas();
+      });
 });

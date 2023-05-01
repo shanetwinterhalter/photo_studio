@@ -10,7 +10,6 @@ const maskColor = "rgba(255, 255, 255, 0.75)";
 const canvas = $("#canvas")[0];
 const ctx = canvas.getContext("2d");
 const img = $("#resultImage")[0];
-let mask = new Array(img.naturalWidth * img.naturalHeight).fill(0);
 
 let segmentationMasks;
 let currentSegmentIndex = 0;
@@ -39,11 +38,12 @@ function draw(e) {
     if (!painting) return;
     if (toolMode != "brush") return;
 
-    const zoomLevel = getZoomLevel();
-    const canvasRect = $("#canvas")[0].getBoundingClientRect();
-    const x = Math.floor((e.clientX - canvasRect.left) / zoomLevel);
-    const y = Math.floor((e.clientY - canvasRect.top) / zoomLevel);
-    let brushSize = $("#brushSizeSlider").val();
+    const brushSize = $("#brushSizeSlider").val();
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const zoomLevel = getZoomLevel()
+    const x = (e.clientX - canvasRect.left) / zoomLevel;
+    const y = (e.clientY - canvasRect.top) / zoomLevel;
 
     ctx.lineWidth = brushSize;
     ctx.lineCap = brushCap;
@@ -53,20 +53,9 @@ function draw(e) {
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(x, y);
-
-    for (let i = -brushSize; i < brushSize; i++) {
-        for (let j = -brushSize; j < brushSize; j++) {
-            if (i * i + j * j < brushSize * brushSize) {
-                const index = (y + j) * img.naturalWidth + (x + i);
-                if (index >= 0 && index < brushMask.length) {
-                    brushMask[index] = 1;
-                }
-            }
-        }
-    }
 }
 
-function applyPredefinedMask(e) {
+/*function applyPredefinedMask(e) {
     if (!segmentationMasks || !segmentationMasks.length) return;
   
     const zoomLevel = getZoomLevel();
@@ -125,7 +114,7 @@ function applyPredefinedMask(e) {
             ctx.fillRect(x, y, 1, 1);
         }
     }
-}
+}*/
 
 function getActiveEditButton() {
     const activeButton = $('input[name="imageEditRadio"]:checked').attr('id');
@@ -140,16 +129,19 @@ function getActiveEditButton() {
     }
 }
 
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 function configureCanvas() {
     img.addEventListener("load", function () {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        
-        canvas.addEventListener("mousedown", function(e) {
+        resizeCanvas();
+
+        canvas.addEventListener("mousedown", function (e) {
             toolMode = getActiveEditButton();
             startPosition(e, toolMode);
         });
-        canvas.addEventListener("mouseup", function() {
+        canvas.addEventListener("mouseup", function () {
             toolMode = getActiveEditButton();
             finishedPosition(toolMode);
         });
@@ -159,12 +151,33 @@ function configureCanvas() {
     })
 }
 
+export function resizeCanvas() {
+    const imageRect = img.getBoundingClientRect();
+    const imageWidth = imageRect.width;
+    const imageHeight = imageRect.height;
+
+    // Create a temporary canvas and copy the current canvas content
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.drawImage(canvas, 0, 0);
+
+    // Resize the main canvas
+    canvas.width = imageWidth;
+    canvas.height = imageHeight;
+
+    // Redraw the content from the temporary canvas, scaling it to the new size
+    ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, canvas.width, canvas.height);
+}
+
 export function configureImageEditTools() {
     // Configure canvas whenever image is updated
     const observer = new MutationObserver((mutationsList, observer) => {
         // check if the src attribute has changed
         for (let mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                clearCanvas();
                 configureCanvas();
                 break;
             }
@@ -174,5 +187,3 @@ export function configureImageEditTools() {
     // configure the observer to watch for changes to the src attribute
     observer.observe($("#resultImage").get(0), { attributes: true, attributeFilter: ['src'] });
 }
-
-export { mask }
