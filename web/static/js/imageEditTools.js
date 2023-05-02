@@ -79,7 +79,6 @@ function applyPredefinedMask(e) {
     const maskData = overlappingMasks[currentSegmentIndex % overlappingMasks.length].segmentation;
     const mask = [].concat(...maskData); // Flatten the 2D array
     const scalingFactor = (canvas.width * canvas.height) / mask.length
-    console.log(scalingFactor)
 
     currentSegmentIndex++;
   

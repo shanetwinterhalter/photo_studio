@@ -14,10 +14,15 @@ export function getCanvasBase64() {
     const imageData = nativeCtx.getImageData(0, 0, nativeCanvas.width, nativeCanvas.height).data;
 
     // Create a binary mask array from the image data
-    const binaryMask = [];
+    let binaryMask = [];
     for (let i = 0; i < imageData.length; i += 4) {
         // Here, we consider a pixel colored if its red channel value is greater than 128
         binaryMask.push(imageData[i] > 128 ? 1 : 0);
+    }
+
+    // If invert mask checkbox ticked, then invert all values in binaryMask
+    if ($('#invertMaskCheckbox').is(':checked')) {
+        binaryMask = binaryMask.map(value => value === 1 ? 0 : 1);
     }
 
     // Convert the binary mask array to a Uint8Array
