@@ -2,7 +2,6 @@ import numpy as np
 
 from . import appconfig
 from base64 import b64decode
-from cv2 import imread
 from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
 from diffusers import StableDiffusionInpaintPipeline
 from .image_fns import save_image, resize_image, save_segmented_image
@@ -82,18 +81,18 @@ def inpaint_image(config):
 
 def segment_image(config):
     img = Image.open(config["image_url"])
-    max_width, max_height = appconfig.MAX_SEGMENT_RES
-    img_width, img_height = img.size
+    # max_width, max_height = appconfig.MAX_SEGMENT_RES
+    # img_width, img_height = img.size
 
-    if img_width > max_width or img_height > max_height:
-        aspect_ratio = float(img_width) / float(img_height)
-        if img_width > img_height:
-            new_width = max_width
-            new_height = int(new_width / aspect_ratio)
-        else:
-            new_height = max_height
-            new_width = int(new_height * aspect_ratio)
-        img = img.resize((new_width, new_height), Image.ANTIALIAS)
+    # if img_width > max_width or img_height > max_height:
+    #    aspect_ratio = float(img_width) / float(img_height)
+    #    if img_width > img_height:
+    #        new_width = max_width
+    #        new_height = int(new_width / aspect_ratio)
+    #    else:
+    #        new_height = max_height
+    #        new_width = int(new_height * aspect_ratio)
+    #    img = img.resize((new_width, new_height), Image.ANTIALIAS)
 
     img_array = np.array(img)
     sam = sam_model_registry["vit_h"](checkpoint=appconfig.SEGMENT_MODEL)

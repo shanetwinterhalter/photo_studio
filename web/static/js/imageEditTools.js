@@ -1,4 +1,4 @@
-import { getActiveEditButton, getZoomLevel, resizeCanvas } from './utils/uiUtils.js'
+import { getActiveEditButton, resizeCanvas } from './utils/uiUtils.js'
 import { eventBus } from './utils/maskUtils.js'
 
 let painting = false;
@@ -42,9 +42,8 @@ function draw(e) {
     const brushSize = $("#brushSizeSlider").val();
 
     const canvasRect = canvas.getBoundingClientRect();
-    const zoomLevel = getZoomLevel()
-    const x = (e.clientX - canvasRect.left) / zoomLevel;
-    const y = (e.clientY - canvasRect.top) / zoomLevel;
+    const x = (e.clientX - canvasRect.left);
+    const y = (e.clientY - canvasRect.top);
 
     ctx.lineWidth = brushSize;
     ctx.lineCap = brushCap;
@@ -56,57 +55,45 @@ function draw(e) {
     ctx.moveTo(x, y);
 }
 
-function applyMask(segmentMask, clear = false) {
-    const zoomLevel = getZoomLevel();
+function applyPredefinedMask(e) {
+    if (!segmentationMasks || !segmentationMasks.length) return;
+  
     const scaleX = canvas.width / img.naturalWidth;
     const scaleY = canvas.height / img.naturalHeight;
 
-    if (clear && previousMask) {
-        for (let i = 0; i < previousMask.length; i++) {
-            if (previousMask[i]) {
-                const x = i % img.naturalWidth;
-                const y = Math.floor(i / img.naturalWidth);
-                ctx.clearRect(x * scaleX, y * scaleY, scaleX, scaleY);
-            }
-        }
-    }
-
-    for (let i = 0; i < segmentMask.length; i++) {
-        if (segmentMask[i]) {
-            const x = i % img.naturalWidth;
-            const y = Math.floor(i / img.naturalWidth);
-            ctx.fillStyle = maskColor;
-            ctx.fillRect(x * scaleX, y * scaleY, scaleX, scaleY);
-        }
-    }
-
-    previousMask = segmentMask;
-}
-
-function applyPredefinedMask(e) {
-    console.log(currentSegmentIndex)
-    if (toolMode != "segment") return;
-    if (!segmentationMasks || !segmentationMasks.length) return;
     const canvasRect = canvas.getBoundingClientRect();
-    const zoomLevel = getZoomLevel()
-    const x = Math.floor((e.clientX - canvasRect.left) / zoomLevel);
-    const y = Math.floor((e.clientY - canvasRect.top) / zoomLevel);
-
+    const x_click = Math.floor((e.clientX - canvasRect.left) / scaleX);
+    const y_click = Math.floor((e.clientY - canvasRect.top) / scaleY);
+  
     const overlappingMasks = segmentationMasks.filter(maskData => {
-        const row = maskData.segmentation[y];
-        return row && row[x];
+        const row = maskData.segmentation[y_click];
+        return row && row[x_click];
     });
 
     if (!overlappingMasks.length) return;
 
     overlappingMasks.sort((a, b) => a.area - b.area);
-
+  
     const maskData = overlappingMasks[currentSegmentIndex % overlappingMasks.length].segmentation;
     const mask = [].concat(...maskData); // Flatten the 2D array
-    const clearPreviousMask = currentSegmentIndex > 0;
-    applyMask(mask, clearPreviousMask);
+    const scalingFactor = (canvas.width * canvas.height) / mask.length
+    console.log(scalingFactor)
+
     currentSegmentIndex++;
+  
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < mask.length; i++) {
+        if (mask[i]) {
+            const x_pix = (i % img.naturalWidth) * scaleX;
+            const y_pix = Math.floor(i / img.naturalWidth) * scaleY;
+            ctx.fillStyle = maskColor;
+            ctx.fillRect(x_pix, y_pix, scaleX, scaleY);
+        }
+    }
 }
+
 
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

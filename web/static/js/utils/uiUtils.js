@@ -14,11 +14,6 @@ export function updatePrompts() {
     $("#negativePrompt").val($("#negativePromptModal").val());
 }
 
-export function getZoomLevel() {
-    const zoomContainer = $('#zoomContainer');
-    return parseFloat(zoomContainer.css('transform').split(',')[3]) || 1;
-}
-
 // Toggle panning
 export function toggleImagePanning(enable) {
     if (!!$("#zoomContainer").data("ui-draggable")) {
