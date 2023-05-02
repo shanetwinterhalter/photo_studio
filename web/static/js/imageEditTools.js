@@ -57,6 +57,8 @@ function draw(e) {
 
 function applyPredefinedMask(e) {
     if (!segmentationMasks || !segmentationMasks.length) return;
+
+    ctx.fillStyle = maskColor;
   
     const scaleX = canvas.width / img.naturalWidth;
     const scaleY = canvas.height / img.naturalHeight;
@@ -88,7 +90,6 @@ function applyPredefinedMask(e) {
         if (mask[i]) {
             const x_pix = (i % img.naturalWidth) * scaleX;
             const y_pix = Math.floor(i / img.naturalWidth) * scaleY;
-            ctx.fillStyle = maskColor;
             ctx.fillRect(x_pix, y_pix, scaleX, scaleY);
         }
     }
