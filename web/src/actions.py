@@ -3,7 +3,7 @@ import numpy as np
 from . import appconfig
 from base64 import b64decode
 from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
-from diffusers import StableDiffusionInpaintPipeline
+from diffusers import StableDiffusionInpaintPipeline, EulerDiscreteScheduler
 from .image_fns import save_image, resize_image, save_segmented_image
 from io import BytesIO
 from PIL import Image
@@ -15,7 +15,8 @@ from .utils import get_prompt, get_negative_prompt
 def generate_image(config):
     inference_pipe = StableDiffusionPipeline.from_pretrained(
             appconfig.IMAGE_MODEL, torch_dtype=float16).to("cuda")
-
+    inference_pipe.scheduler = EulerDiscreteScheduler.from_config(
+        inference_pipe.scheduler.config)
     image = inference_pipe(
         get_prompt(config["prompt"]),
         negative_prompt=get_negative_prompt(

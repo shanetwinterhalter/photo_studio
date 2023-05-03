@@ -13,11 +13,11 @@ export async function callModel(
             method: "POST",
             data: {
                 action: action,
-                prompt: $("#imgPrompt").val(),
+                prompt: ($("#imgPrompt").val() + " " + $("#systemPrompt").val()),
                 image_url: $("#resultImage").attr("src"),
                 mask: maskBase64,
                 image: imageBase64,
-                negativePrompt: $("#negativePrompt").val(),
+                negativePrompt: ($("#negativePrompt").val() + " " + $("#negativeSystemPrompt").val()),
                 inferenceSteps: $("#stepsSlider").val(),
                 guidanceScale: $("#guidanceSlider").val(),
             },
@@ -26,7 +26,9 @@ export async function callModel(
                 console.error(error);
             },
             complete: function() {
-                disableUi(false)
+                if (action != "segment") {
+                    disableUi(false)
+                }
             }
         })
 }

@@ -19,6 +19,12 @@ function configureSidebarButtons() {
         }
         displayUserOptions();
     });
+
+    // When clicking the new image button, populate the prompt data
+    $("#newImageButton").on("click", function () {
+        $("#imgPromptModal").val($("#imgPrompt").val());
+        $("#negativePromptModal").val($("#negativePrompt").val());
+    });
 }
 
 function isAnyButtonSelected() {

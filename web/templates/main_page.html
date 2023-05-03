@@ -33,7 +33,7 @@
 </div>
 <div id="optionGroups" class="sidebar main-content-group">
     <div id="uiSectionSelectors" class="btn-group-vertical" role="group" aria-label="Button group">
-        <button class="btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#imageModal">
+        <button id="newImageButton" class="btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#imageModal">
             <i class="fa fa-upload"></i>
         </button>
         <button class="btn btn-link selectable" type="button" data-bs-toggle="collapse" data-bs-target="#editImageOptions">
@@ -107,6 +107,14 @@
                     DEFAULTARGS.guidanceScale }}</span></label>
             <input type="range" class="form-range" min="0" max="30" value="{{ DEFAULTARGS.guidanceScale }}"
                 id="guidanceSlider">
+        </div>
+        <div class="py-1">
+            <label for="systemPrompt" class="form-label">System Prompt</label>
+            <textarea class="form-control" id="systemPrompt" rows="3" placeholder="Enter a prompt">{{ DEFAULTARGS.systemPrompt }}</textarea>
+        </div>
+        <div class="py-1">
+            <label for="negativeSystemPrompt" class="form-label">Negative system Prompt</label>
+            <textarea class="form-control" id="negativeSystemPrompt" rows="3" placeholder="Enter a negative prompt">{{ DEFAULTARGS.negativeSystemPrompt}}</textarea>
         </div>
         <hr class="custom-line">
     </div>
