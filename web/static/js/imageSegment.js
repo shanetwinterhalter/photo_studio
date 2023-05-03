@@ -1,15 +1,19 @@
 import { callModel } from './utils/serverRequest.js'
 import { updateSegmentMask } from './utils/maskUtils.js'
+import { disableSegMaskUi } from './utils/uiUtils.js'
 
 function requestImageSegmentation() {
     // Set mask to null in case segmentation fails
     updateSegmentMask(null);
 
+    // Disabled mask button
+    disableSegMaskUi(true)
+
     callModel(
         "segment",
         function (response) {
             updateSegmentMask(response.image_mask);
-            console.log("Segmentation complete");
+            disableSegMaskUi(false)
         },
     );
 }

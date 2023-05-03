@@ -87,3 +87,15 @@ export function resizeAndRecentreImage() {
         top: 0,
     });
 }
+
+export function disableSegMaskUi(loading) {
+    if (loading) {
+        console.log("Segmentation in progress, disabling UI")
+        // Disable mask button and add loading icon
+        $("#maskIcon").prop("disabled", true);
+    } else {
+        console.log("Segmentation complete, re-enabling UI")
+        // Re-enable mask button and remove loading icon
+        $("#maskIcon").prop("disabled", false);
+    }
+}
