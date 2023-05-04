@@ -1,10 +1,12 @@
 import numpy as np
+import requests
 
 from . import appconfig
 from cv2 import addWeighted, imwrite
 from hashlib import md5
+from io import BytesIO
 from os import path
-from PIL import ImageOps
+from PIL import Image, ImageOps
 from random import randint
 
 
@@ -14,7 +16,7 @@ def rotate_image(image):
 
 def save_image(image, filename=None, debug=False):
     if filename is None:
-        filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+        filename = f"{md5(image.tobytes()).hexdigest()}.png"
 
     if debug:
         folder = appconfig.DEBUG_IMAGE_UPLOADS
@@ -26,16 +28,39 @@ def save_image(image, filename=None, debug=False):
 
     image.save(
         path.join(folder, filename),
-        'JPEG',
+        'PNG',
         quality=90
     )
     image_url = f"{folder}/{filename}"
     return image_url
 
 
+def save_image_from_url(url, filename=None, debug=False):
+    if debug:
+        folder = appconfig.DEBUG_IMAGE_UPLOADS
+    else:
+        folder = appconfig.IMAGE_UPLOADS
+
+    # Download image and save locally
+    response = requests.get(url)
+    response.raise_for_status()
+
+    # Open the image using PIL
+    image = Image.open(BytesIO(response.content))
+
+    # Generate filename from image hash
+    if filename is None:
+        filename = f"{md5(image.tobytes()).hexdigest()}.png"
+
+    image_url = path.join(folder, filename)
+    image.save(image_url)
+
+    return image_url
+
+
 def save_segmented_image(image, masks, filename=None, debug=False):
     if filename is None:
-        filename = f"{md5(image.tobytes()).hexdigest()}.jpeg"
+        filename = f"{md5(image.tobytes()).hexdigest()}.png"
 
     if debug:
         folder = appconfig.DEBUG_IMAGE_UPLOADS

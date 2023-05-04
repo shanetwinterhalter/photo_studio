@@ -1,10 +1,10 @@
 import numpy as np
+import replicate
 
 from . import appconfig
 from base64 import b64decode
-from diffusers import StableDiffusionPipeline, StableDiffusionUpscalePipeline
-from diffusers import StableDiffusionInpaintPipeline, EulerDiscreteScheduler
-from .image_fns import save_image, resize_image, save_segmented_image
+from diffusers import StableDiffusionUpscalePipeline, StableDiffusionInpaintPipeline
+from .image_fns import save_image, resize_image, save_segmented_image, save_image_from_url
 from io import BytesIO
 from PIL import Image
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
@@ -13,19 +13,23 @@ from .utils import get_prompt, get_negative_prompt
 
 
 def generate_image(config):
-    inference_pipe = StableDiffusionPipeline.from_pretrained(
-            appconfig.IMAGE_MODEL, torch_dtype=float16).to("cuda")
-    inference_pipe.scheduler = EulerDiscreteScheduler.from_config(
-        inference_pipe.scheduler.config)
-    image = inference_pipe(
-        get_prompt(config["prompt"]),
-        negative_prompt=get_negative_prompt(
-            config["negativePrompt"]),
-        num_inference_steps=int(config["inferenceSteps"]),
-        guidance_scale=float(config["guidanceScale"])
-        ).images[0]
-
-    return {"image_url": save_image(image)}
+    model = appconfig.IMAGE_MODEL["modelName"] + \
+            ":" + appconfig.IMAGE_MODEL["modelVersion"]
+    output = replicate.run(
+        model,
+        input={
+            "prompt": config["prompt"],
+            "negative_prompt": config["negativePrompt"],
+            "image_dimensions": appconfig.IMAGE_MODEL["dimensions"],
+            "num_outputs": appconfig.IMAGE_MODEL["numOutputs"],
+            "num_inference_steps": int(config["inferenceSteps"]),
+            "guidance_scale": float(config["guidanceScale"]),
+            "scheduler": appconfig.IMAGE_MODEL["scheduler"]
+        }
+    )
+    # We can support multiple images easily but for now limit to 1
+    local_img_url = save_image_from_url(output[0])
+    return {"image_url": local_img_url}
 
 
 def upscale_image(config):

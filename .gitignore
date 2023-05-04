@@ -7,3 +7,4 @@ web/images
 web/debug_images
 .vscode
 *.code-workspace
+creds.sh

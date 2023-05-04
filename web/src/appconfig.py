@@ -22,7 +22,13 @@ DEFAULTARGS = {
                             " ((ugly face)), ((fat)), ((extra legs)), anime"
 }
 
-IMAGE_MODEL = "stabilityai/stable-diffusion-2"
+IMAGE_MODEL = {
+    "modelName": "stability-ai/stable-diffusion",
+    "modelVersion": "db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+    "numOutputs": 1,
+    "dimensions": "768x768",
+    "scheduler": "DPMSolverMultistep"
+}
 
 SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
 MAX_SEGMENT_RES = (1920, 1920)
