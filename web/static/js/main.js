@@ -1,7 +1,6 @@
 import { setupUi } from './uiSetup.js'
 import { configureImageUpload } from './imageUpload.js'
 import { configureImageGeneration } from './imageGeneration.js'
-import { configureImageUpscaling } from './imageUpscale.js'
 import { configureImageInpainting } from './imageInpaint.js'
 import { configureImageSaving } from './imageSave.js'
 import { configureImageEditTools } from './imageEditTools.js'
@@ -18,9 +17,6 @@ $(document).ready(function () {
 
     // Image generation
     configureImageGeneration();
-
-    // Image Upscale
-    configureImageUpscaling();
 
     // Image Inpaint
     configureImageInpainting();

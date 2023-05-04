@@ -1,25 +1,26 @@
+DEBUG_MODE = True
+
 DEFAULTARGS = {
-    "prompt": "a portrait photo of a shane man, handsome, " +
-              "clear skin, ",
+    "prompt": "a portrait photo of a person",
     "inferenceSteps": "30",
     "guidanceScale": "8",
     "negativePrompt": "bad, deformed, ugly, bad anatomy, cartoon, " +
                       "animated, scary, wrinkles, duplicate, double",
-    "brushSize": "10",
+    "brushSize": "20",
     "systemPrompt": "photograph, photorealistic, well lit, beautiful, " +
                     "ultra realistic, hyper detail, unedited, symmetrical " +
                     "balance, in-frame",
-    "negativeSystemPrompt": "((out of frame)), ((extra fingers)), mutated "
-                            "hands, ((poorly drawn hands)), ((poorly drawn "
-                            "face)), (((mutation))), (((deformed))), " +
-                            "(((tiling))), ((naked)), ((tile)), " +
-                            "((fleshpile)), ((ugly)), (((abstract))), " +
-                            "blurry, ((bad anatomy)), ((bad proportions)), " +
-                            "((extra limbs)), cloned face, (((skinny))), " +
-                            "glitchy, ((extra breasts)), ((double torso)), " +
-                            "((extra arms)), ((extra hands)), ((mangled " +
-                            "fingers)), ((missing breasts)), (missing lips)," +
-                            " ((ugly face)), ((fat)), ((extra legs)), anime"
+    "negativeSystemPrompt": "out of frame, extra fingers, mutated "
+                            "hands, poorly drawn hands, poorly drawn "
+                            "face, mutation, deformed, " +
+                            "tiling, naked, tile, " +
+                            "fleshpile, ugly, abstract, " +
+                            "blurry, bad anatomy, bad proportions, " +
+                            "extra limbs, cloned face, " +
+                            "glitchy, extra breasts, double torso, " +
+                            "extra arms, extra hands, mangled " +
+                            "fingers, missing breasts, missing lips," +
+                            " ugly face, extra legs"
 }
 
 IMAGE_MODEL = {
@@ -30,14 +31,17 @@ IMAGE_MODEL = {
     "scheduler": "DPMSolverMultistep"
 }
 
+INPAINT_MODEL = {
+    "modelName": "stability-ai/stable-diffusion-inpainting",
+    "modelVersion": "c28b92a7ecd66eee4aefcd8a94eb9e7f6c3805d5f06038165407fb5cb355ba67",
+    "numOutputs": 1
+}
+
 SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
 MAX_SEGMENT_RES = (1920, 1920)
 
 UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
 UPSCALE_RES = (256, 256)
-
-INPAINT_MODEL = "stabilityai/stable-diffusion-2-inpainting"
-MAX_INPAINT_RES = (1024, 1024)
 
 MAX_REQUEST_RETRIES = 6
 RETRY_DELAY = 20

@@ -2,6 +2,7 @@ import numpy as np
 import requests
 
 from . import appconfig
+from base64 import b64decode
 from cv2 import addWeighted, imwrite
 from hashlib import md5
 from io import BytesIO
@@ -93,3 +94,20 @@ def resize_image(image, max_res):
         return image.resize((new_width, new_height))
     else:
         return image
+
+
+def create_mask_image(b64_mask_string, size):
+    decoded_mask = b64decode(b64_mask_string)
+    height, width = size
+
+    # Decode mask and create NumPy array
+    mask_array = np.frombuffer(
+        decoded_mask,
+        dtype=np.uint8
+        ).reshape(width, height) * 255
+
+    # Create mask image and resize
+    mask_img = Image.fromarray(mask_array).convert("RGB")
+    mask_img = mask_img.resize(size)
+
+    return mask_img

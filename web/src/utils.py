@@ -4,20 +4,6 @@ from os import listdir, path, remove
 from time import sleep
 
 
-def get_prompt(prompt):
-    if prompt:
-        return prompt
-    else:
-        return appconfig.DEFAULTARGS["prompt"]
-
-
-def get_negative_prompt(request):
-    if request:
-        return request
-    else:
-        return appconfig.DEFAULTARGS["negativePrompt"]
-
-
 def delete_old_files():
     folder_path = appconfig.IMAGE_UPLOADS
     time_limit = datetime.now() - \

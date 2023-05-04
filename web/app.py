@@ -1,8 +1,7 @@
-from src.actions import generate_image, segment_image, upload_image
-from src.actions import upscale_image, inpaint_image
-from flask import Flask, render_template, request, jsonify, send_from_directory
-from src.image_fns import save_image
-from PIL import Image
+from src.actions import (generate_image, segment_image,
+                         upload_image, inpaint_image)
+from flask import (Flask, render_template, request,
+                   jsonify, send_from_directory)
 from src.utils import delete_old_files
 from threading import Thread
 from time import sleep
@@ -35,8 +34,6 @@ def call_model():
                 response = generate_image(request.form)
             elif action == "segment":
                 response = segment_image(request.form)
-            elif action == "upscale":
-                response = upscale_image(request.form)
             elif action == "inpaint":
                 response = inpaint_image(request.form)
             return jsonify(response)
