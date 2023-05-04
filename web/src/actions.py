@@ -1,13 +1,11 @@
-import numpy as np
 import replicate
 
 from . import appconfig
 from base64 import b64decode
-from .image_fns import (save_image, save_segmented_image,
-                        save_image_from_url, create_mask_image)
+from .image_fns import (save_image, save_image_from_url,
+                        create_mask_image, img_to_bytes)
 from io import BytesIO
 from PIL import Image
-from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 
 
 def upload_image(config):
@@ -49,23 +47,13 @@ def inpaint_image(config):
     init_img = Image.open(config["image_url"]).convert("RGB")
     mask_img = create_mask_image(config["mask"], init_img.size)
 
-    # Convert the images to bytes in memory
-    init_img_bytes = BytesIO()
-    mask_img_bytes = BytesIO()
-    init_img.save(init_img_bytes, format='PNG')
-    mask_img.save(mask_img_bytes, format='PNG')
-
-    # Reset the buffer position to the beginning
-    init_img_bytes.seek(0)
-    mask_img_bytes.seek(0)
-
     output = replicate.run(
         model,
         input={
             "prompt": config["prompt"],
             "negative_prompt": config["negativePrompt"],
-            "image": init_img_bytes,
-            "mask": mask_img_bytes,
+            "image": img_to_bytes(init_img),
+            "mask": img_to_bytes(mask_img),
             "num_outputs": appconfig.IMAGE_MODEL["numOutputs"],
             "num_inference_steps": int(config["inferenceSteps"]),
             "guidance_scale": float(config["guidanceScale"])
@@ -85,26 +73,28 @@ def inpaint_image(config):
 
 
 def segment_image(config):
-    img = Image.open(config["image_url"])
-    # max_width, max_height = appconfig.MAX_SEGMENT_RES
-    # img_width, img_height = img.size
+    model = appconfig.SEGMENT_MODEL["modelName"] + \
+        ":" + appconfig.SEGMENT_MODEL["modelVersion"]
 
-    # if img_width > max_width or img_height > max_height:
-    #    aspect_ratio = float(img_width) / float(img_height)
-    #    if img_width > img_height:
-    #        new_width = max_width
-    #        new_height = int(new_width / aspect_ratio)
-    #    else:
-    #        new_height = max_height
-    #        new_width = int(new_height * aspect_ratio)
-    #    img = img.resize((new_width, new_height), Image.ANTIALIAS)
+    original_filename = config["image_url"].split("/")[-1].split(".")[0]
+    img = Image.open(config["image_url"]).convert("RGB")
 
-    img_array = np.array(img)
-    sam = sam_model_registry["vit_h"](checkpoint=appconfig.SEGMENT_MODEL)
-    sam.to("cuda")
-    mask_generator = SamAutomaticMaskGenerator(sam)
-    masks = mask_generator.generate(img_array)
-    for item in masks:
-        item["segmentation"] = item["segmentation"].tolist()
-    save_segmented_image(img_array, masks, "segmented_image.jpeg", debug=True)
-    return {"image_mask": masks}
+    output = replicate.run(
+        model,
+        input={
+            "image": img_to_bytes(img),
+        }
+    )
+
+    mask_image_paths = [] * len(output)
+    for idx, item in enumerate(output):
+        mask_filename = original_filename + "_" + str(idx) + ".png"
+        mask_url = save_image_from_url(item, filename=mask_filename)
+        mask_image_paths.append(mask_url)
+
+    if appconfig.DEBUG_MODE:
+        for idx, item in enumerate(output):
+            debug_mask_filename = "seg_mask_" + str(idx) + ".png"
+            save_image_from_url(item, filename=debug_mask_filename)
+
+    return {"image_mask": mask_image_paths}

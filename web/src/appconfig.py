@@ -37,11 +37,12 @@ INPAINT_MODEL = {
     "numOutputs": 1
 }
 
-SEGMENT_MODEL = "../models/sam_vit_h_4b8939.pth"
-MAX_SEGMENT_RES = (1920, 1920)
-
-UPSCALE_MODEL = "stabilityai/stable-diffusion-x4-upscaler"
-UPSCALE_RES = (256, 256)
+SEGMENT_MODEL = {
+    "modelName": "shanetwinterhalter/segment-anything-model",
+    "modelVersion": "0c5dd33132c5e5863ed72223e9c9166f2dc81e6d98f10368c15c1db82b4102c1",
+    "maxHeight": 1024,
+    "maxWidth": 1024
+}
 
 MAX_REQUEST_RETRIES = 6
 RETRY_DELAY = 20
