@@ -4,6 +4,7 @@ DEFAULTARGS = {
     "prompt": "a portrait photo of a person",
     "inferenceSteps": "30",
     "guidanceScale": "8",
+    "maxGuidanceScale": "20",
     "negativePrompt": "bad, deformed, ugly, bad anatomy, cartoon, " +
                       "animated, scary, wrinkles, duplicate, double",
     "brushSize": "20",

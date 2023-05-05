@@ -1,4 +1,4 @@
-import { getActiveEditButton, resizeCanvas } from './utils/uiUtils.js'
+import { getActiveEditButton, resizeCanvas, fillTempCanvas } from './utils/uiUtils.js'
 import { eventBus } from './utils/maskUtils.js'
 
 let painting = false;
@@ -10,9 +10,10 @@ const maskColor = "rgba(255, 255, 255, 0.75)";
 const canvas = $("#canvas")[0];
 const ctx = canvas.getContext("2d");
 const img = $("#resultImage")[0];
+const tempCanvas = $("#tempCanvas")[0];
+
 
 let segmentationMasks;
-let previousMask = null;
 let currentSegmentIndex = 0;
 
 eventBus.addEventListener("masksDataReceived", function (event) {
@@ -24,7 +25,6 @@ function startPosition(e, toolMode) {
     if (toolMode === "brush") {
         draw(e);
     } else if (toolMode === "segment") {
-        //currentSegmentIndex = 0;
         applyPredefinedMask(e)
     }
 }
@@ -59,39 +59,30 @@ function applyPredefinedMask(e) {
     if (!segmentationMasks || !segmentationMasks.length) return;
 
     ctx.fillStyle = maskColor;
-  
-    const scaleX = canvas.width / img.naturalWidth;
-    const scaleY = canvas.height / img.naturalHeight;
 
     const canvasRect = canvas.getBoundingClientRect();
-    const x_click = Math.floor((e.clientX - canvasRect.left) / scaleX);
-    const y_click = Math.floor((e.clientY - canvasRect.top) / scaleY);
-  
-    const overlappingMasks = segmentationMasks.filter(maskData => {
-        const row = maskData.segmentation[y_click];
-        return row && row[x_click];
+    const x_click = Math.floor((e.clientX - canvasRect.left));
+    const y_click = Math.floor((e.clientY - canvasRect.top));
+
+    const overlappingMasks = segmentationMasks.filter(mask => {
+        const maskX = x_click * mask.width / img.width;
+        const maskY = y_click * mask.height / img.height;
+        const pixelData = mask.getContext('2d').getImageData(maskX, maskY, 1, 1).data;
+        return pixelData[3] > 0; // Check if the alpha channel value is greater than 0
     });
 
-    if (!overlappingMasks.length) return;
+    if (overlappingMasks.length > 0) {
+        const maskIndex = currentSegmentIndex % overlappingMasks.length;
+        const mask = overlappingMasks[maskIndex];
 
-    overlappingMasks.sort((a, b) => a.area - b.area);
-  
-    const maskData = overlappingMasks[currentSegmentIndex % overlappingMasks.length].segmentation;
-    const mask = [].concat(...maskData); // Flatten the 2D array
-    const scalingFactor = (canvas.width * canvas.height) / mask.length
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        // Draw brush masks back on
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.drawImage(mask, 0, 0, img.width, img.height);
+        ctx.globalCompositeOperation = 'source-over';
+    }
 
     currentSegmentIndex++;
-  
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < mask.length; i++) {
-        if (mask[i]) {
-            const x_pix = (i % img.naturalWidth) * scaleX;
-            const y_pix = Math.floor(i / img.naturalWidth) * scaleY;
-            ctx.fillRect(x_pix, y_pix, scaleX, scaleY);
-        }
-    }
 }
 
 
@@ -132,4 +123,25 @@ export function configureImageEditTools() {
 
     // configure the observer to watch for changes to the src attribute
     observer.observe($("#resultImage").get(0), { attributes: true, attributeFilter: ['src'] });
+
+    // When mask button selected, copy to temp 
+    $("#maskIcon").on("click", function (event) {
+        fillTempCanvas();
+    });
+}
+
+
+
+// Debug functions
+function applyAllMasks() {
+    if (!segmentationMasks || !segmentationMasks.length) return;
+
+    console.log(segmentationMasks[0])
+
+    // Apply all masks
+    //ctx.globalCompositeOperation = 'destination-in';
+    for (let mask of segmentationMasks) {
+        ctx.drawImage(mask, 0, 0, canvas.width, canvas.height);
+    }
+    //ctx.globalCompositeOperation = 'source-over';
 }

@@ -1,3 +1,11 @@
+export function fillTempCanvas() {
+    tempCanvas = $("#tempCanvas")[0];
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(canvas, 0, 0);
+}
+
 // Prevent user sending multiple server requests
 export function disableUi(enable) {
     if (enable) {

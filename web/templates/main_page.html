@@ -103,7 +103,7 @@
         <div>
             <label for="guidanceSlider" class="form-label">Guidance scale: <span id="guidanceValue">{{
                     DEFAULTARGS.guidanceScale }}</span></label>
-            <input type="range" class="form-range" min="0" max="30" value="{{ DEFAULTARGS.guidanceScale }}"
+            <input type="range" class="form-range" min="0" max="{{ DEFAULTARGS.maxGuidanceScale }}" value="{{ DEFAULTARGS.guidanceScale }}"
                 id="guidanceSlider">
         </div>
         <div class="py-1">
@@ -125,6 +125,6 @@
             <div id="loader" class="loader" style="display: none;"></div>
         </div>
     </div>
+    <canvas id="tempCanvas" style="display: none"></canvas>
 </div>
-
 {% endblock %}

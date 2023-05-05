@@ -1,8 +1,8 @@
 import { callModel } from './utils/serverRequest.js'
-import { updateSegmentMask } from './utils/maskUtils.js'
+import { updateSegmentMask, loadMasksFromUrls } from './utils/maskUtils.js'
 import { disableSegMaskUi } from './utils/uiUtils.js'
 
-function requestImageSegmentation() {
+async function requestImageSegmentation() {
     // Set mask to null in case segmentation fails
     updateSegmentMask(null);
 
@@ -11,9 +11,15 @@ function requestImageSegmentation() {
 
     callModel(
         "segment",
-        function (response) {
-            updateSegmentMask(response.image_mask);
-            disableSegMaskUi(false)
+        async function (response) {
+            try {
+                const loadedMasks = await loadMasksFromUrls(response.image_mask);
+                updateSegmentMask(loadedMasks);
+            } catch (error) {
+                console.error(`Error loading masks: ${error}`);
+            } finally {
+                disableSegMaskUi(false);
+            }
         },
     );
 }
