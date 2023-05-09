@@ -13,6 +13,7 @@ body {
 #userOptions {
   min-width: 20vh;
   text-align: center;
+  overflow-y: auto;
 }
 
 .sidebar {
