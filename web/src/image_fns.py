@@ -22,9 +22,6 @@ def save_image(image, filename=None, debug=False):
     else:
         folder = appconfig.IMAGE_UPLOADS
 
-    # Rotate images if needed
-    image = rotate_image(image)
-
     image.save(
         path.join(folder, filename),
         'PNG',
@@ -34,7 +31,7 @@ def save_image(image, filename=None, debug=False):
     return image_url
 
 
-def save_image_from_url(url, filename=None, debug=False):
+def save_image_from_url(url, filename=None, debug=False, padding=(0, 0, 0, 0)):
     if debug:
         folder = appconfig.DEBUG_IMAGE_UPLOADS
     else:
@@ -47,6 +44,10 @@ def save_image_from_url(url, filename=None, debug=False):
     # Open the image using PIL
     image = Image.open(BytesIO(response.content))
 
+    # Remove padding if needed
+    if padding != (0, 0, 0, 0):
+        image = remove_padding(image, padding)
+
     # Generate filename from image hash
     if filename is None:
         filename = f"{md5(image.tobytes()).hexdigest()}.png"
@@ -57,18 +58,41 @@ def save_image_from_url(url, filename=None, debug=False):
     return image_url
 
 
-def resize_image(image, max_res):
+def resize_image(image):
     width, height = image.size
+    max_res = appconfig.MAX_IMAGE_RES
+
     if width > max_res[0] or height > max_res[1]:
-        if width > height:
-            new_width = max_res[0]
-            new_height = int(height * new_width / width)
-        else:
-            new_height = max_res[1]
-            new_width = int(width * new_height / height)
-        return image.resize((new_width, new_height))
-    else:
-        return image
+        image.thumbnail(max_res, resample=Image.LANCZOS)
+
+    return image
+
+
+def make_square(image, padding_color=(0, 0, 0)):
+    width, height = image.size
+    max_dim = max(width, height)
+
+    left_padding = (max_dim - width) // 2
+    right_padding = max_dim - width - left_padding
+    top_padding = (max_dim - height) // 2
+    bottom_padding = max_dim - height - top_padding
+
+    padding = (left_padding, top_padding, right_padding, bottom_padding)
+    print(f"Adding padding: {padding}")
+    return (ImageOps.expand(image, padding, fill=padding_color), padding)
+
+
+def remove_padding(image, padding=(0, 0, 0, 0)):
+    print(f"Removing padding: {padding}")
+    left_padding, top_padding, right_padding, bottom_padding = padding
+    width, height = image.size
+
+    left = left_padding
+    upper = top_padding
+    right = width - right_padding
+    lower = height - bottom_padding
+    print(f"Calculated crop values: {(left, upper, right, lower)}")
+    return image.crop((left, upper, right, lower))
 
 
 def create_mask_image(b64_mask_string, size):

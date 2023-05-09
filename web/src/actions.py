@@ -2,8 +2,9 @@ import replicate
 
 from . import appconfig
 from base64 import b64decode
-from .image_fns import (save_image, save_image_from_url,
-                        create_mask_image, img_to_bytes)
+from .image_fns import (save_image, save_image_from_url, rotate_image,
+                        create_mask_image, img_to_bytes, resize_image,
+                        make_square)
 from io import BytesIO
 from PIL import Image
 
@@ -11,6 +12,13 @@ from PIL import Image
 def upload_image(config):
     image_data = BytesIO(b64decode(config["image"].split(",")[1]))
     image = Image.open(image_data).convert('RGB')
+
+    # Rotate images if needed
+    image = rotate_image(image)
+
+    # Resize image to max size if larger
+    image = resize_image(image)
+
     return {"image_url": save_image(image)}
 
 
@@ -47,6 +55,14 @@ def inpaint_image(config):
     init_img = Image.open(config["image_url"]).convert("RGB")
     mask_img = create_mask_image(config["mask"], init_img.size)
 
+    # Add padding to ensure images are square
+    init_img, padding = make_square(init_img)
+    mask_img, _ = make_square(mask_img)
+
+    # Scale padding - inpaint always returns 512x512
+    scale_factor = 512 / init_img.size[0]
+    padding = tuple(pad * scale_factor for pad in padding)
+
     output = replicate.run(
         model,
         input={
@@ -60,7 +76,7 @@ def inpaint_image(config):
         }
     )
     # We can support multiple images easily but for now limit to 1
-    local_img_url = save_image_from_url(output[0])
+    local_img_url = save_image_from_url(output[0], padding=padding)
 
     if appconfig.DEBUG_MODE:
         save_image(mask_img, "mask_image.png", debug=True)
@@ -95,6 +111,6 @@ def segment_image(config):
     if appconfig.DEBUG_MODE:
         for idx, item in enumerate(output):
             debug_mask_filename = "seg_mask_" + str(idx) + ".png"
-            save_image_from_url(item, filename=debug_mask_filename)
+            save_image_from_url(item, filename=debug_mask_filename, debug=True)
 
     return {"image_mask": mask_image_paths}

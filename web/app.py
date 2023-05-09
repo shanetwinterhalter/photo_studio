@@ -4,7 +4,6 @@ from flask import (Flask, render_template, request,
                    jsonify, send_from_directory)
 from src.utils import cleanup_images
 from threading import Thread
-from time import sleep
 
 import src.appconfig as appconfig
 
@@ -30,7 +29,10 @@ def call_model():
     elif action == "generate":
         response = generate_image(request.form)
     elif action == "segment":
-        response = segment_image(request.form)
+        if appconfig.ENABLE_SEGMENTATION:
+            response = segment_image(request.form)
+        else:
+            response = ""
     elif action == "inpaint":
         response = inpaint_image(request.form)
     return jsonify(response)

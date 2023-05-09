@@ -1,4 +1,10 @@
-DEBUG_MODE = True
+DEBUG_MODE = False
+DEBUG_IMAGE_UPLOADS = 'debug_images'
+
+ENABLE_SEGMENTATION = False
+MAX_IMAGE_RES = (1024, 1024)
+IMAGE_UPLOADS = 'images'
+MAX_IMAGE_AGE_HOURS = 24
 
 DEFAULTARGS = {
     "prompt": "a portrait photo of a person",
@@ -44,10 +50,3 @@ SEGMENT_MODEL = {
     "maxHeight": 1024,
     "maxWidth": 1024
 }
-
-MAX_REQUEST_RETRIES = 6
-RETRY_DELAY = 20
-
-DEBUG_IMAGE_UPLOADS = 'debug_images'
-IMAGE_UPLOADS = 'images'
-MAX_IMAGE_AGE_HOURS = 24
