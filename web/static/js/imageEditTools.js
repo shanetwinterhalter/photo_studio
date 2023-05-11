@@ -41,9 +41,8 @@ function draw(e) {
 
     const brushSize = $("#brushSizeSlider").val();
 
-    const canvasRect = canvas.getBoundingClientRect();
-    const x = (e.clientX - canvasRect.left);
-    const y = (e.clientY - canvasRect.top);
+    const x = e.offsetX;
+    const y = e.offsetY;
 
     ctx.lineWidth = brushSize;
     ctx.lineCap = brushCap;
@@ -61,8 +60,8 @@ function applyPredefinedMask(e) {
     ctx.fillStyle = maskColor;
 
     const canvasRect = canvas.getBoundingClientRect();
-    const x_click = Math.floor((e.clientX - canvasRect.left));
-    const y_click = Math.floor((e.clientY - canvasRect.top));
+    const x_click = e.offsetX;
+    const y_click = e.offsetY;
 
     const overlappingMasks = segmentationMasks.filter(mask => {
         const maskX = x_click * mask.width / img.width;
@@ -128,20 +127,4 @@ export function configureImageEditTools() {
     $("#maskIcon").on("click", function (event) {
         fillTempCanvas();
     });
-}
-
-
-
-// Debug functions
-function applyAllMasks() {
-    if (!segmentationMasks || !segmentationMasks.length) return;
-
-    console.log(segmentationMasks[0])
-
-    // Apply all masks
-    //ctx.globalCompositeOperation = 'destination-in';
-    for (let mask of segmentationMasks) {
-        ctx.drawImage(mask, 0, 0, canvas.width, canvas.height);
-    }
-    //ctx.globalCompositeOperation = 'source-over';
 }
