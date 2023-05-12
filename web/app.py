@@ -12,8 +12,18 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def main_page():
+    return render_template('landing_page.html', ARGS=appconfig.LANDING_PAGE)
+
+
+@app.route('/studio', methods=['GET'])
+def product_page():
     return render_template('main_page.html',
                            DEFAULTARGS=appconfig.DEFAULTARGS)
+
+
+@app.route('/resources/<path:filename>')
+def serve_resources(filename):
+    return send_from_directory('resources', filename)
 
 
 @app.route("/images/<path:filename>")

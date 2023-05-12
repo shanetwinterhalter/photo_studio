@@ -1,0 +1,38 @@
+.signup-box {
+    background-color: #f8f9fa;
+    border: 1px solid #000000;
+}
+
+.hero-img {
+    max-height: 400px;
+    /* Adjust this value according to your needs */
+    width: auto;
+    object-fit: cover;
+    /* This will help to keep the aspect ratio of the images */
+}
+
+.hero {
+    min-height: 100vh;
+}
+
+.image-container {
+    position: relative;
+    width: 45%;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+}
+
+.image-label {
+    position: absolute;
+    bottom: -10px;  /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000000;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 1.2rem;
+    color: #f8f9fa
+}

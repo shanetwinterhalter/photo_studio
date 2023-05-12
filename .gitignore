@@ -8,3 +8,4 @@ web/debug_images
 .vscode
 *.code-workspace
 creds.sh
+resources

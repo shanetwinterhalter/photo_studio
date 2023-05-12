@@ -1,4 +1,4 @@
-DEBUG_MODE = False
+DEBUG_MODE = True
 DEBUG_IMAGE_UPLOADS = 'debug_images'
 
 ENABLE_SEGMENTATION = False
@@ -39,8 +39,8 @@ IMAGE_MODEL = {
 }
 
 INPAINT_MODEL = {
-    "modelName": "stability-ai/stable-diffusion-inpainting",
-    "modelVersion": "c28b92a7ecd66eee4aefcd8a94eb9e7f6c3805d5f06038165407fb5cb355ba67",
+    "modelName": "shanetwinterhalter/stable-diffusion-inpainting-resizeable",
+    "modelVersion": "9a29c1ad2594e8fc0522cc01655fe734184a102dfe2f86eb1d8fde3f1bb98d85",
     "numOutputs": 1
 }
 
@@ -49,4 +49,9 @@ SEGMENT_MODEL = {
     "modelVersion": "0c5dd33132c5e5863ed72223e9c9166f2dc81e6d98f10368c15c1db82b4102c1",
     "maxHeight": 1024,
     "maxWidth": 1024
+}
+
+LANDING_PAGE = {
+    "headline": "Transform Your Images with the Power of AI",
+    "tagline": "Edit images like a pro with our easy-to-use AI-powered app (coming soon!)"
 }
