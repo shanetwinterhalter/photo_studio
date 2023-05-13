@@ -1,4 +1,4 @@
-from . import appconfig
+from .. import appconfig
 from datetime import datetime, timedelta
 from os import listdir, path, remove
 from time import sleep

@@ -1,8 +1,10 @@
-from src.actions import (generate_image, segment_image,
-                         upload_image, inpaint_image)
 from flask import (Flask, render_template, request,
                    jsonify, send_from_directory)
-from src.utils import cleanup_images
+from src.generate import generate_image
+from src.inpaint import inpaint_image
+from src.segment import segment_image
+from src.upload import upload_image
+from src.utils.file_cleanup import cleanup_images
 from threading import Thread
 
 import src.appconfig as appconfig
@@ -34,17 +36,17 @@ def serve_image(filename):
 @app.route('/call_model', methods=['POST'])
 def call_model():
     action = request.form["action"]
+    print(action)
     if action == "upload":
         response = upload_image(request.form)
     elif action == "generate":
         response = generate_image(request.form)
     elif action == "segment":
-        if appconfig.ENABLE_SEGMENTATION:
-            response = segment_image(request.form)
-        else:
-            response = ""
+        response = segment_image(request.form)
     elif action == "inpaint":
         response = inpaint_image(request.form)
+    else:
+        response = ""
     return jsonify(response)
 
 

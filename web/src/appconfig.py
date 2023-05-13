@@ -2,7 +2,7 @@ DEBUG_MODE = True
 DEBUG_IMAGE_UPLOADS = 'debug_images'
 
 ENABLE_SEGMENTATION = False
-MAX_IMAGE_RES = (1024, 1024)
+MAX_IMAGE_RES = (1350, 1080)
 IMAGE_UPLOADS = 'images'
 MAX_IMAGE_AGE_HOURS = 24
 
@@ -32,26 +32,30 @@ DEFAULTARGS = {
 
 IMAGE_MODEL = {
     "modelName": "stability-ai/stable-diffusion",
-    "modelVersion": "db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+    "modelVersion": "db21e45d3f7023abc2a46ee38a23973f6dce16bb"
+                    "082a930b0c49861f96d1e5bf",
     "numOutputs": 1,
     "dimensions": "768x768",
     "scheduler": "DPMSolverMultistep"
 }
 
 INPAINT_MODEL = {
-    "modelName": "shanetwinterhalter/stable-diffusion-inpainting-resizeable",
-    "modelVersion": "9a29c1ad2594e8fc0522cc01655fe734184a102dfe2f86eb1d8fde3f1bb98d85",
+    "modelName": "stability-ai/stable-diffusion-inpainting",
+    "modelVersion": "c28b92a7ecd66eee4aefcd8a94eb9e7f6c3805d5f"
+                    "06038165407fb5cb355ba67",
     "numOutputs": 1
 }
 
 SEGMENT_MODEL = {
     "modelName": "shanetwinterhalter/segment-anything-model",
-    "modelVersion": "0c5dd33132c5e5863ed72223e9c9166f2dc81e6d98f10368c15c1db82b4102c1",
+    "modelVersion": "0c5dd33132c5e5863ed72223e9c9166f2dc81e6d98"
+                    "f10368c15c1db82b4102c1",
     "maxHeight": 1024,
     "maxWidth": 1024
 }
 
 LANDING_PAGE = {
     "headline": "Transform Your Images with the Power of AI",
-    "tagline": "Edit images like a pro with our easy-to-use AI-powered app (coming soon!)"
+    "tagline": "Edit images like a pro with our easy-to-use AI-powered app"
+               " (coming soon!)"
 }

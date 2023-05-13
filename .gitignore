@@ -9,3 +9,4 @@ web/debug_images
 *.code-workspace
 creds.sh
 resources
+*.pkl
