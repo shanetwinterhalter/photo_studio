@@ -1,7 +1,7 @@
 DEBUG_MODE = True
 DEBUG_IMAGE_UPLOADS = 'debug_images'
 
-ENABLE_SEGMENTATION = True
+ENABLE_SEGMENTATION = False
 MAX_IMAGE_RES = (1080, 1350)  # (width, height)
 GRID_SIZE = 512  # How big sub-images are - set to max inpainting size
 IMAGE_UPLOADS = 'images'
@@ -45,6 +45,12 @@ INPAINT_MODEL = {
     "modelVersion": "c28b92a7ecd66eee4aefcd8a94eb9e7f6c3805d5f"
                     "06038165407fb5cb355ba67",
     "numOutputs": 1
+}
+
+UPSCALE_MODEL = {
+    "modelName": "jagilley/stable-diffusion-upscaler",
+    "modelVersion": "4d0aeee7387b1170b0f6f42bdf14c7d9d8e00"
+                    "a15430d95446ad7426dc61fc3d8"
 }
 
 SEGMENT_MODEL = {

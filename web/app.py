@@ -54,4 +54,4 @@ if __name__ == '__main__':
     file_deletion_thread = Thread(target=cleanup_images,
                                   daemon=True)
     file_deletion_thread.start()
-    app.run(debug=True)
+    app.run(port=5001, debug=True)

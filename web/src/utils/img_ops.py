@@ -32,12 +32,7 @@ def save_image(image, filename=None, debug=False):
 
 
 def save_image_from_url(url, filename=None, debug=False, padding=(0, 0, 0, 0)):
-    # Download image and save locally
-    response = requests.get(url)
-    response.raise_for_status()
-
-    # Open the image using PIL
-    image = Image.open(BytesIO(response.content))
+    image = load_image_from_url(url)
 
     # Remove padding if needed
     if padding != (0, 0, 0, 0):
@@ -51,3 +46,12 @@ def img_to_bytes(img):
     img.save(img_bytes, format='PNG')
     img_bytes.seek(0)
     return img_bytes
+
+
+def load_image_from_url(url):
+    # Download image and save locally
+    response = requests.get(url)
+    response.raise_for_status()
+
+    # Open the image using PIL
+    return Image.open(BytesIO(response.content))

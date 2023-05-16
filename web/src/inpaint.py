@@ -2,10 +2,12 @@ import replicate
 import numpy as np
 
 from . import appconfig
-from PIL import Image, ImageDraw
+from PIL import Image
 from skimage.measure import label, regionprops
 from scipy.spatial import distance
-from .utils.img_ops import save_image, save_image_from_url, img_to_bytes
+from .utils.img_manip import make_square
+from .utils.img_ops import (save_image, save_image_from_url,
+                            img_to_bytes, load_image_from_url)
 from .utils.masks import create_mask_image
 
 
@@ -105,7 +107,7 @@ def reassemble_image(init_img, output_urls, inpaint_coords):
     return init_img
 
 
-def inpaint_image(config):
+def inpaint_image_subimages(config):
     model = appconfig.INPAINT_MODEL["modelName"] + \
             ":" + appconfig.INPAINT_MODEL["modelVersion"]
 
@@ -140,5 +142,47 @@ def inpaint_image(config):
         for idx, (section_img, section_mask) in enumerate(inpaint_sections):
             save_image(section_img, str(idx) + "section_img.png", debug=True)
             save_image(section_mask, str(idx) + "section_mask.png", debug=True)
+
+    return {"image_url": local_img_url}
+
+
+def inpaint_image(config):
+    model = appconfig.INPAINT_MODEL["modelName"] + \
+            ":" + appconfig.INPAINT_MODEL["modelVersion"]
+
+    init_img = Image.open(config["image_url"]).convert("RGB")
+    mask_img = create_mask_image(config["mask"], init_img.size)
+
+    # Add padding to ensure images are square
+    init_img, padding = make_square(init_img)
+    mask_img, _ = make_square(mask_img)
+
+    # Scale padding - inpaint always returns 512x512
+    scale_factor = 512 / init_img.size[0]
+    # padding = tuple(pad * scale_factor for pad in padding)
+
+    output = replicate.run(
+        model,
+        input={
+            "prompt": config["prompt"],
+            "negative_prompt": config["negativePrompt"],
+            "image": img_to_bytes(init_img),
+            "mask": img_to_bytes(mask_img),
+            "num_outputs": appconfig.IMAGE_MODEL["numOutputs"],
+            "num_inference_steps": int(config["inferenceSteps"]),
+            "guidance_scale": float(config["guidanceScale"])
+        }
+    )
+
+    inpainted_image = load_image_from_url(output[0])
+
+    local_img_url = save_image_from_url(inpainted_image, padding=padding)
+
+    if appconfig.DEBUG_MODE:
+        save_image(mask_img, "mask_image.png", debug=True)
+        save_image(init_img, "initial_image.png", debug=True)
+        save_image(Image.open(local_img_url),
+                   "inpainted_image.png",
+                   debug=True)
 
     return {"image_url": local_img_url}
