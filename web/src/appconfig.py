@@ -47,12 +47,6 @@ INPAINT_MODEL = {
     "numOutputs": 1
 }
 
-UPSCALE_MODEL = {
-    "modelName": "jagilley/stable-diffusion-upscaler",
-    "modelVersion": "4d0aeee7387b1170b0f6f42bdf14c7d9d8e00"
-                    "a15430d95446ad7426dc61fc3d8"
-}
-
 SEGMENT_MODEL = {
     "modelName": "shanetwinterhalter/segment-anything-model",
     "modelVersion": "0c5dd33132c5e5863ed72223e9c9166f2dc81e6d98"
