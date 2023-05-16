@@ -88,10 +88,10 @@ def get_image_sections_from_bounding_boxes(
         n_height_sections = height // section_size + 1
         width_offset = section_size - (
             (section_size * n_width_sections - width) //
-            (n_width_sections - 1)) if n_width_sections != 1 else 0
+            (n_width_sections - 1)) if n_width_sections > 1 else 0
         height_offset = section_size - (
             (section_size * n_height_sections - height) //
-            (n_height_sections - 1)) if n_width_sections != 1 else 0
+            (n_height_sections - 1)) if n_height_sections > 1 else 0
 
         for v in range(n_width_sections):
             start_x = start_c + v * width_offset
