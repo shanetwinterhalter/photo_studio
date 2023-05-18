@@ -29,6 +29,7 @@ function configureImagePanning() {
 }
 
 export function updateImage(imageUrl) {
+    $('#zoomContainer').css('transform', 'scale(1)');
     const img = $("#resultImage")
     img.attr("src", imageUrl);
     img.show();

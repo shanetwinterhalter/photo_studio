@@ -35,7 +35,8 @@ $(document).ready(function () {
 
     // Resize and reconfigure image when window resized
     window.addEventListener("resize", () => {
-        resizeAndRecentreImage();
-        resizeCanvas();
-      });
+      $('#zoomContainer').css('transform', 'scale(1)');
+      resizeAndRecentreImage();
+      resizeCanvas();
+    });
 });
