@@ -1,3 +1,5 @@
 # Photo Studio
 
-This repository aims to provide a web based photo generation and editing tool. 
+A web based tool to use Stable Diffusion and Segment Anything AI models for photo editing. 
+
+Models are run on Replicate and require a Replicate API token
