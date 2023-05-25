@@ -1,7 +1,7 @@
 DEBUG_MODE = True
 DEBUG_IMAGE_UPLOADS = 'debug_images'
 
-ENABLE_SEGMENTATION = True
+ENABLE_SEGMENTATION = False
 MAX_IMAGE_RES = (1080, 1350)  # (width, height)
 GRID_SIZE = 512  # How big sub-images are - set to max inpainting size
 IMAGE_UPLOADS = 'images'
