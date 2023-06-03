@@ -9,7 +9,7 @@ from threading import Thread
 
 import src.appconfig as appconfig
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/photo-studio/static')
 
 
 @app.route('/', methods=['GET'])
